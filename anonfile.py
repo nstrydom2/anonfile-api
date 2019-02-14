@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 class AnonFile():
     def __init__(self):
         self.anonfile_endpoint_url = 'https://anonfile.com/api/'
-        self.api_key = '?token=df6d530f01f1831b'
+        self.api_key = ''
 
     # takes file path and uploads file returning the url
     # to download file after the upload is complete, elses
