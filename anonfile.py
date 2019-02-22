@@ -38,16 +38,20 @@ class AnonFile():
 
         try:
             file_upload = {'file': open(file_path, 'rb')}
+
+            # Post method, upload file and receive callback
             response = requests.post(self.anonfile_endpoint_url + service + self.api_key,
                                      files=file_upload, verify=True, timeout=self.timeout)
 
             status = bool(response.json()['status'])
-            download_url = response.json()['data']['file']['url']['full']
+
+            # File info, file json object as stated at https://anonfile.com/docs/api
+            file_obj = response.json()['data']['file']
 
             if not status:
                 raise Exception("File upload was not successful.")
 
-            return status, download_url
+            return status, file_obj
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
