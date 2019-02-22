@@ -57,13 +57,15 @@ class AnonFile():
     # Automatically downloads from anonfile.com based
     # on the given url in file_obj. A json object containing
     # meta data about the uploaded file
-    def download_file(self, file_obj):
+    def download_file(self, file_obj, location=None):
         try:
-            download_url = self.scrape_file_location(file_obj['url']['short'])
+            download_url = self.scrape_file_location(file_obj['url']['full'])
+
+            print(download_url)
 
             # download code goes here
             if download_url is not None:
-                wget.download(download_url)
+                wget.download(download_url, location)
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
@@ -75,4 +77,4 @@ class AnonFile():
         response = requests.get(url, timeout=self.timeout)
         soup = BeautifulSoup(response.text, 'lxml')
 
-        return soup.find_all('a')[0].attrs['href']
+        return soup.find_all('a')[1].attrs['href']
