@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0711b2ed-a104-4f0d-b633-7bfc0fac4798" name="Default Changelist" comment="Refactored old test code, created a testcase in it's place">
-      <change beforePath="$PROJECT_DIR$/anonfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/anonfile.py" afterDir="false" />
-    </list>
+    <list default="true" id="0711b2ed-a104-4f0d-b633-7bfc0fac4798" name="Default Changelist" comment="Refactored old test code, created a testcase in it's place" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
