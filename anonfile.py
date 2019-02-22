@@ -58,8 +58,17 @@ class AnonFile():
     # on the given url in file_obj. A json object containing
     # meta data about the uploaded file
     def download_file(self, file_obj, location=None):
+        # Scrapes the provided url for the url to the
+        # actual file. Only called by 'download_file()'
+        def scrape_file_location(self, url):
+            # Get method, retrieving the web page
+            response = requests.get(url, timeout=self.timeout)
+            soup = BeautifulSoup(response.text, 'lxml')
+
+            return soup.find_all('a')[1].attrs['href']
+
         try:
-            download_url = self.scrape_file_location(file_obj['url']['full'])
+            download_url = scrape_file_location(file_obj['url']['full'])
 
             print(download_url)
 
@@ -70,11 +79,4 @@ class AnonFile():
         except Exception as ex:
             print("[*] Error -- " + str(ex))
 
-    # Scrapes the provided url for the url to the
-    # actual file. Only called by 'download_file()'
-    def scrape_file_location(self, url):
-        # Get method, retrieving the web page
-        response = requests.get(url, timeout=self.timeout)
-        soup = BeautifulSoup(response.text, 'lxml')
 
-        return soup.find_all('a')[1].attrs['href']

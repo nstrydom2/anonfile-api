@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="0711b2ed-a104-4f0d-b633-7bfc0fac4798" name="Default Changelist" comment="Refactored old test code, created a testcase in it's place">
       <change beforePath="$PROJECT_DIR$/anonfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/anonfile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/anonfile_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/anonfile_test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,14 +34,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="3668" />
+          <entry key="py" value="3671" />
           <entry key="txt" value="67" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="67" />
-          <entry key="Python" value="3668" />
+          <entry key="Python" value="3671" />
         </counts>
       </usages-collector>
     </session>
@@ -52,12 +51,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/anonfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="56" selection-start-line="8" selection-start-column="56" selection-end-line="8" selection-end-column="56" />
+            <state relative-caret-position="729">
+              <caret line="61" column="55" lean-forward="true" selection-start-line="61" selection-start-column="55" selection-end-line="61" selection-end-column="55" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1550874293926" expanded="true" signature="176:177" ph="..." />
-                <marker date="1550874293926" expanded="true" signature="176:181" ph="..." />
+                <marker date="1550874499226" expanded="true" signature="176:177" ph="..." />
+                <marker date="1550874499226" expanded="true" signature="176:181" ph="..." />
               </folding>
             </state>
           </provider>
@@ -91,8 +90,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/net.py" />
-        <option value="$PROJECT_DIR$/anonfile.py" />
         <option value="$PROJECT_DIR$/anonfile_test.py" />
+        <option value="$PROJECT_DIR$/anonfile.py" />
       </list>
     </option>
   </component>
@@ -273,11 +272,11 @@
     <frame x="-1" y="28" width="1922" height="1053" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24960506" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.24960506" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.32903227" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32903227" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32903227" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -292,12 +291,12 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.24960506" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24960506" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32903227" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.32903227" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32903227" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -345,12 +344,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/anonfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="56" selection-start-line="8" selection-start-column="56" selection-end-line="8" selection-end-column="56" />
+        <state relative-caret-position="729">
+          <caret line="61" column="55" lean-forward="true" selection-start-line="61" selection-start-column="55" selection-end-line="61" selection-end-column="55" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-            <marker date="1550874293926" expanded="true" signature="176:177" ph="..." />
-            <marker date="1550874293926" expanded="true" signature="176:181" ph="..." />
+            <marker date="1550874499226" expanded="true" signature="176:177" ph="..." />
+            <marker date="1550874499226" expanded="true" signature="176:181" ph="..." />
           </folding>
         </state>
       </provider>
