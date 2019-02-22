@@ -1,4 +1,5 @@
 import requests
+import wget
 import net
 import json
 
@@ -15,8 +16,10 @@ class AnonFile():
         # Set timeout (connect, read)
         self.timeout = (5, 5)
 
-    # Custom timeout constructor
-    def __init__(self, api_key , custom_timeout):
+    # Custom timeout constructor -- Dev can set
+    # their own custom timeout as to accomodate slower
+    # internet connections
+    def __init__(self, api_key, custom_timeout):
         # Api endpoint
         self.anonfile_endpoint_url = 'https://anonfile.com/api/'
 
@@ -60,18 +63,20 @@ class AnonFile():
 
     # Automatically downloads from anonfile.com based
     # on the given url in file_obj. A json object containing
-    # meta data about the uploaded file.
+    # meta data about the uploaded file
     def download_file(self, file_obj):
         try:
             download_url = self.scrape_file_location(file_obj['url']['short'])
 
             # download code goes here
+            if download_url is not None:
+                wget.download(download_url)
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
 
     # Scrapes the provided url for the url to the
-    # actual file. Only called by 'download_file()'.
+    # actual file. Only called by 'download_file()'
     def scrape_file_location(self, url):
         # Get method, retrieving the web page
         response = requests.get(url, timeout=self.timeout)
