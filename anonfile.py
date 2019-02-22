@@ -34,15 +34,14 @@ class AnonFile():
         service = 'upload'
 
         # Return variables
-        status = ''
-        download_url = ''
+        status = False
 
         try:
             file_upload = {'file': open(file_path, 'rb')}
             response = requests.post(self.anonfile_endpoint_url + service + self.api_key,
-                                     files=file_upload, verify=True)
+                                     files=file_upload, verify=True, timeout=self.timeout)
 
-            status = response.json()['status']
+            status = bool(response.json()['status'])
             download_url = response.json()['data']['file']['url']['full']
 
             if not status:
@@ -59,11 +58,17 @@ class AnonFile():
     # on the given url
     def download_file(self, url):
         try:
-            reponse = requests.get(url, timeout=self.timeout)
-            soup = BeautifulSoup(reponse.text, 'lxml')
-            download_url = soup.find_all('a')[0].attrs['href']
+            download_url = self.scrape_file_location(url)
 
             # download code goes here
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
+
+    # Scrapes the provided url for the url to the
+    # actual file. Only called by 'download_file()'.
+    def scrape_file_location(self, url):
+        response = requests.get(url, timeout=self.timeout)
+        soup = BeautifulSoup(response.text, 'lxml')
+
+        return soup.find_all('a')[0].attrs['href']
