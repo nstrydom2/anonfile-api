@@ -138,7 +138,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python tests.Unittests for anonfile_test.AnonfileTest">
     <configuration name="anonfile" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="anonfileapi" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -160,8 +160,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Unittests for anonfile_test.AnonfileTest" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="anonfileapi" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;anonfile_test.AnonfileTest&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.anonfile" />
+      <item itemvalue="Python tests.Unittests for anonfile_test.AnonfileTest" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Unittests for anonfile_test.AnonfileTest" />
         <item itemvalue="Python.anonfile" />
       </list>
     </recent_temporary>
