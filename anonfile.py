@@ -6,28 +6,21 @@ import json
 from bs4 import BeautifulSoup
 
 class AnonFile():
-    def __init__(self, api_key):
+    # Custom timeout needs to be a tuple (connection_timeout, read_timeout)
+    def __init__(self, api_key, custom_timeout=None):
         # Api endpoint
         self.anonfile_endpoint_url = 'https://anonfile.com/api/'
 
         # User specific api key
-        self.api_key = api_key
+        self.api_key = '?token=' + api_key
 
-        # Set timeout (connect, read)
-        self.timeout = (5, 5)
-
-    # Custom timeout constructor -- Dev can set
-    # their own custom timeout as to accomodate slower
-    # internet connections
-    def __init__(self, api_key, custom_timeout):
-        # Api endpoint
-        self.anonfile_endpoint_url = 'https://anonfile.com/api/'
-
-        # User specific api key
-        self.api_key = api_key
-
-        # Set timeout (connect, read)
-        self.timeout = custom_timeout
+        # Dev can set their own custom timeout as
+        # to accomodate slower internet connections
+        if custom_timeout is not None:
+            self.timeout = custom_timeout
+        else:
+            # Set timeout (connect, read)
+            self.timeout = (5, 5)
 
     # Takes file path and uploads file returning the url
     # to download file after the upload is complete, elses
