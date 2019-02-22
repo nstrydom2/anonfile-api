@@ -59,10 +59,11 @@ class AnonFile():
             return status, None
 
     # Automatically downloads from anonfile.com based
-    # on the given url
-    def download_file(self, url):
+    # on the given url in file_obj. A json object containing
+    # meta data about the uploaded file.
+    def download_file(self, file_obj):
         try:
-            download_url = self.scrape_file_location(url)
+            download_url = self.scrape_file_location(file_obj['url']['short'])
 
             # download code goes here
 
