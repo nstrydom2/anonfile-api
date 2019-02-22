@@ -68,6 +68,7 @@ class AnonFile():
     # Scrapes the provided url for the url to the
     # actual file. Only called by 'download_file()'.
     def scrape_file_location(self, url):
+        # Get method, retrieving the web page
         response = requests.get(url, timeout=self.timeout)
         soup = BeautifulSoup(response.text, 'lxml')
 
