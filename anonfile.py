@@ -15,7 +15,7 @@ class AnonFile():
         # Set timeout (connect, read)
         self.timeout = (5, 5)
 
-    # Custom timemout constructor
+    # Custom timeout constructor
     def __init__(self, api_key , custom_timeout):
         # Api endpoint
         self.anonfile_endpoint_url = 'https://anonfile.com/api/'
@@ -30,19 +30,30 @@ class AnonFile():
     # to download file after the upload is complete, elses
     # return None if exception is thrown
     def upload_file(self, file_path):
+        # Service endpoint name
         service = 'upload'
+
+        # Return variables
+        status = ''
+        download_url = ''
 
         try:
             file_upload = {'file': open(file_path, 'rb')}
             response = requests.post(self.anonfile_endpoint_url + service + self.api_key,
                                      files=file_upload, verify=True)
 
-            return response.json()['status'], response.json()['data']['file']['url']['full']
+            status = response.json()['status']
+            download_url = response.json()['data']['file']['url']['full']
+
+            if not status:
+                raise Exception("File upload was not successful.")
+
+            return status, download_url
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
 
-            return None
+            return status, None
 
     # Automatically downloads from anonfile.com based
     # on the given url
@@ -56,4 +67,3 @@ class AnonFile():
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
- 
