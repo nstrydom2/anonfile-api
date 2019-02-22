@@ -23,7 +23,7 @@ class AnonFile():
             self.timeout = (5, 5)
 
     # Takes file path and uploads file returning the url
-    # to download file after the upload is complete, elses
+    # to download file after the upload is complete, else
     # return None if exception is thrown
     def upload_file(self, file_path):
         # Service endpoint name
