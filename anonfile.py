@@ -15,7 +15,7 @@ class AnonFile():
         self.api_key = '?token=' + api_key
 
         # Dev can set their own custom timeout as
-        # to accomodate slower internet connections
+        # to accommodate slower internet connections
         if custom_timeout is not None:
             self.timeout = custom_timeout
         else:
