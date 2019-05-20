@@ -3,7 +3,12 @@ from pyapiwiz import Uri
 class AnonFile(Uri):
     # Custom timeout needs to be a tuple (connection_timeout, read_timeout)
     def __init__(self, api_key, server=None, uri=None, custom_timeout=None):
-        server_list = {}
+        # openload.cc letsupload.cc megaupload.nz bayfiles.com
+        server_list = {'anonfile': 'https://anonfile.com',
+                        'openload': 'https://openload.cc',
+                       'letsupload': 'https://letsupload.cc',
+                       'megaupload': 'https://megaupload.nz',
+                       'bayfiles': 'https://bayfiles.com'}
 
         # Api endpoint
         if server not in server_list:
@@ -12,7 +17,7 @@ class AnonFile(Uri):
             else:
                 self.anonfile_endpoint_url = 'https://anonfile.com/api'
         else:
-            self.anonfile_endpoint_url = server_list[server]
+            self.anonfile_endpoint_url = server_list[server] + '/api'
 
         # User specific api key
         self.api_key = '?token=' + api_key
