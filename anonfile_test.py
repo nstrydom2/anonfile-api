@@ -12,7 +12,7 @@ class AnonfileTest(unittest.TestCase):
         self.test_obj = anonfile.AnonFile(self.my_api_key)
 
     def test_returns_success_on_upload_file(self):
-        status, self.file_obj = self.test_obj.upload_file('/home/ghost/my_test01.zip')
+        status, self.file_obj = self.test_obj.upload_file('/home/ghost/my_test01')
 
         print("[*] File object -- " + json.dumps(self.file_obj))
 
@@ -22,6 +22,6 @@ class AnonfileTest(unittest.TestCase):
         self.test_obj.download_file(self.file_obj)
 
     def test_returns_file_on_successful_download(self):
-        location = '/home/ghost/PycharmProjects/anonfileapi/my_test01.zip'
+        location = '/home/ghost/Repos/anonfile-api/my_test01'
 
         assert (Path(location).is_file())

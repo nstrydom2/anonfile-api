@@ -10,7 +10,7 @@ class Uri:
     # return None if exception is thrown
     def upload_file(self, file_path):
         # Service endpoint name
-        service = 'upload'
+        service = '/upload'
 
         # Return variables
         status = False
@@ -43,7 +43,7 @@ class Uri:
     def download_file(self, file_obj, location=None):
         # Scrapes the provided url for the url to the
         # actual file. Only called by 'download_file()'
-        def scrape_file_location(self, url):
+        def scrape_file_location(url):
             # Get method, retrieving the web page
             response = requests.get(url, timeout=self.timeout)
             soup = BeautifulSoup(response.text, 'lxml')
