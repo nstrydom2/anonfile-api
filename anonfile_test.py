@@ -7,7 +7,7 @@ from pathlib import Path
 class AnonfileTest(unittest.TestCase):
     # Instantiate the test object
     def setUp(self):
-        self.my_api_key = ''
+        self.my_api_key = '2f48976493bca746'
 
         self.test_obj = anonfile.AnonFile(self.my_api_key)
 
@@ -22,6 +22,7 @@ class AnonfileTest(unittest.TestCase):
         self.test_obj.download_file(self.file_obj)
 
     def test_returns_file_on_successful_download(self):
-        location = '/home/ghost/Repos/anonfile-api/my_test01'
+        location = '/home/ghost/PycharmProjects/anonfile-api/my_test01'
+        file_exists = __import__('os').path.isfile(location)
 
-        assert (Path(location).is_file())
+        assert (file_exists)
