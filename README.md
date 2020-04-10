@@ -42,7 +42,7 @@ file_url = anon.upload('/home/guest/jims_paperwork.doc')
 anon.download(file_url)
 ```
 
-And viola, pain free anonymous file sharing. Working towards proxying as well. If you want some info on the returning json object(its going to be the "file" object). Visit [Anonfile.com](https://anonfile.com/docs/api).
+And voilà, pain free anonymous file sharing. Working towards proxying as well. If you want some info on the returning json object(its going to be the "file" object). Visit [Anonfile.com](https://anonfile.com/docs/api).
 
 ## Built With
 
