@@ -76,7 +76,7 @@ class AnonFile():
             if not status:
                 raise Exception("File upload was not successful.")
 
-            return status, file_obj
+            return status, file_obj['url']['full']
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
@@ -87,7 +87,7 @@ class AnonFile():
     # on the given url in file_obj. A json object containing
     # meta data about the uploaded file
     @authenticated
-    def download_file(self, file_obj, location=None):
+    def download_file(self, url, location=None):
         # Scrapes the provided url for the url to the
         # actual file. Only called by 'download_file()'
         def scrape_file_location(url):
@@ -98,7 +98,7 @@ class AnonFile():
             return soup.find_all('a')[1].attrs['href']
 
         try:
-            download_url = scrape_file_location(file_obj['url']['full'])
+            download_url = scrape_file_location(url)
 
             print(download_url)
 
