@@ -2,6 +2,7 @@ import wget
 import requests
 
 from bs4 import BeautifulSoup
+from functools import wraps
 
 
 class AnonFile():
@@ -34,12 +35,25 @@ class AnonFile():
             # Set timeout (connect, read)
             self.timeout = (5, 5)
 
+    def authenticated(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            try:
+                if self.api_key is not None:
+                    return func(self, *args, **kwargs)
+                else:
+                    raise Exception("Api key is none, please obtain an Api key.")
+            except Exception as ex:
+                print("[!] Error -- " + str(ex))
+        return wrapper
+
     def list_servers(self):
         print(self.server_list.keys())
 
     # Takes file path and uploads file returning the url
     # to download file after the upload is complete, else
     # return None if exception is thrown
+    @authenticated
     def upload_file(self, file_path):
         # Service endpoint name
         service = '/upload'
@@ -72,6 +86,7 @@ class AnonFile():
     # Automatically downloads from anonfile.com based
     # on the given url in file_obj. A json object containing
     # meta data about the uploaded file
+    @authenticated
     def download_file(self, file_obj, location=None):
         # Scrapes the provided url for the url to the
         # actual file. Only called by 'download_file()'
