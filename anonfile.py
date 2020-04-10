@@ -42,7 +42,7 @@ class AnonFile():
                 if self.api_key is not None:
                     return func(self, *args, **kwargs)
                 else:
-                    raise Exception("Api key is none, please obtain an Api key.")
+                    raise Exception("Api Key is none, please obtain an Api Key.")
             except Exception as ex:
                 print("[!] Error -- " + str(ex))
         return wrapper
