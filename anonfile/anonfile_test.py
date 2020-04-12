@@ -1,8 +1,7 @@
 import unittest
-import anonfile
+from anonfile import anonfile
 import json
 
-from pathlib import Path
 
 class AnonfileTest(unittest.TestCase):
     # Instantiate the test object
