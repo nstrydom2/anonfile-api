@@ -5,15 +5,15 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='anonfile',
-    version='0.1',
-    scripts=['anonfile_api'],
+    version='0.1.1',
     author="Nicholas Strydom",
     author_email="nstrydom@gmail.com",
     description="An unofficial library that wraps the Anonfile.com REST Api.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/nstrydom2/anonfile-api",
-    python_requires='>=3.5',
+    packages=setuptools.find_packages(exclude=['tests*']),
+    python_requires='>=3.7',
     install_requires=[
         'beautifulsoup4>=4.7.1',
         'bs4>=0.0.1',
