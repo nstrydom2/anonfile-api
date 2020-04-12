@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='anonfile-api',
+    name='anonfile',
     version='0.1',
     scripts=['anonfile_api'],
     author="Nicholas Strydom",
