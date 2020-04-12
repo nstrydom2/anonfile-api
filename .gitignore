@@ -1,3 +1,4 @@
 /.idea/
 /.idea/workspace.xml
-/anonfile_test.py
+/tests/anonfile_test.py
+/venv/
