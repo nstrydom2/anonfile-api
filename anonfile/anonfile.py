@@ -29,7 +29,7 @@ from functools import wraps
 
 class AnonFile():
     # Custom timeout needs to be a tuple (connection_timeout, read_timeout)
-    def __init__(self, api_key=None, server=None, uri=None, custom_timeout=None):
+    def __init__(self, api_key='', server=None, uri=None, custom_timeout=None):
         # openload.cc letsupload.cc megaupload.nz bayfiles.com
         self.server_list = {'anonfile': 'https://anonfile.com',
                         'openload': 'https://openload.cc',
