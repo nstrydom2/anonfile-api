@@ -6,7 +6,7 @@ import json
 class AnonfileTest(unittest.TestCase):
     # Instantiate the test object
     def setUp(self):
-        self.my_api_key = '2f48976493bca746'
+        self.my_api_key = ''
 
         self.test_obj = anonfile.AnonFile(self.my_api_key)
 
