@@ -20,12 +20,18 @@ Simply clone the repository.
 git clone https://github.com/nstrydom2/anonfile-api.git
 ```
 
+Or, install the library via Pip.
+
+```
+pip install anonfile
+```
+
 And have fun!
 
 ```
-import anonfile
+from anonfile.anonfile import AnonFile()
 
-anon = AnonFile()
+anon = AnonFile('api_key')
 file_url = anon.upload('/home/guest/jims_paperwork.doc')
 ```
 
@@ -34,9 +40,9 @@ file_url = anon.upload('/home/guest/jims_paperwork.doc')
 Just import the module, and then instantiate the AnonFile() object. Finally, start uploading.
 
 ```
-import anonfile
+from anonfile.anonfile import AnonFile()
 
-anon = AnonFile()
+anon = AnonFile('api_key')
 file_url = anon.upload('/home/guest/jims_paperwork.doc')
 
 anon.download(file_url)
