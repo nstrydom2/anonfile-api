@@ -29,7 +29,7 @@ pip install anonfile
 And have fun!
 
 ```
-from anonfile.anonfile import AnonFile()
+from anonfile.anonfile import AnonFile
 
 anon = AnonFile('api_key')
 file_url = anon.upload('/home/guest/jims_paperwork.doc')
@@ -40,7 +40,7 @@ file_url = anon.upload('/home/guest/jims_paperwork.doc')
 Just import the module, and then instantiate the AnonFile() object. Finally, start uploading.
 
 ```
-from anonfile.anonfile import AnonFile()
+from anonfile.anonfile import AnonFile
 
 anon = AnonFile('api_key')
 file_url = anon.upload('/home/guest/jims_paperwork.doc')
