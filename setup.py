@@ -15,17 +15,17 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['tests*']),
     python_requires='>=3.7',
     install_requires=[
-        'beautifulsoup4>=4.7.1',
+        'beautifulsoup4>=4.9.0',
         'bs4>=0.0.1',
-        'certifi>=2018.11.29',
+        'certifi>=2020.4.5.1',
         'chardet>=3.0.4',
         'hurry.filesize>=0.9',
-        'idna>=2.8',
-        'lxml>=4.3.1',
+        'idna>=2.9',
+        'lxml>=4.5.0',
         'python3-wget>=0.0.2b1',
-        'requests>=2.21.0',
-        'soupsieve>=1.7.3',
-        'urllib3>=1.24.1'
+        'requests>=2.23.0',
+        'soupsieve>=2.0',
+        'urllib3>=1.25.8'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
