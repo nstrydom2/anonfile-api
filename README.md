@@ -32,7 +32,7 @@ And have fun!
 from anonfile.anonfile import AnonFile
 
 anon = AnonFile('api_key')
-file_url = anon.upload('/home/guest/jims_paperwork.doc')
+status, file_url = anon.upload_file('/home/guest/jims_paperwork.doc')
 ```
 
 ## Usage
@@ -43,9 +43,9 @@ Just import the module, and then instantiate the AnonFile() object. Finally, sta
 from anonfile.anonfile import AnonFile
 
 anon = AnonFile('api_key')
-file_url = anon.upload('/home/guest/jims_paperwork.doc')
+status, file_url = anon.upload_file('/home/guest/jims_paperwork.doc')
 
-anon.download(file_url)
+anon.download_file(file_url)
 ```
 
 And voilà, pain free anonymous file sharing. I am also working towards proxy support. If you want some info on the returning JSON object(its going to be the "file" object). Visit [Anonfile.com](https://anonfile.com/docs/api). However, the current version just returns the url instead of the full "file" JSON object.
