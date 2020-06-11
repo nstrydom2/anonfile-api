@@ -67,7 +67,7 @@ See also the list of [contributors](https://github.com/nstrydom2/anonfile-api/co
 
 ## License
 
-This project is licensed under the GNU License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
