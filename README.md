@@ -1,4 +1,4 @@
-# Anonfile.com Unofficial Python API
+# Anonfiles.com Unofficial Python API
 
 This unofficial Python API was created to make uploading and downloading files from Anonfile.com simple, and effective for programming in Python. The goal of the project is to create an intuitive library for anonymous file sharing.
 
@@ -53,7 +53,7 @@ And voilà, pain free anonymous file sharing. I am also working towards proxy su
 ## Built With
 
 * [Requests](http://docs.python-requests.org/en/master/) - Http for Humans
-* [Anonfile.com](https://anonfile.com/docs/api) - AnonFile.com REST API
+* [Anonfiles.com](https://anonfiles.com/docs/api) - AnonFile.com REST API
 
 ## Versioning
 
