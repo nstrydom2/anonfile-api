@@ -42,7 +42,7 @@ class AnonFile():
             if uri is not None:
                 self.anonfile_endpoint_url = uri
             else:
-                self.anonfile_endpoint_url = 'https://anonfile.com/api'
+                self.anonfile_endpoint_url = 'https://api.anonfiles.com'
         else:
             self.anonfile_endpoint_url = self.server_list[server] + '/api'
 
