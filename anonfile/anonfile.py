@@ -31,11 +31,11 @@ class AnonFile():
     # Custom timeout needs to be a tuple (connection_timeout, read_timeout)
     def __init__(self, api_key='', server=None, uri=None, custom_timeout=None):
         # openload.cc letsupload.cc megaupload.nz bayfiles.com
-        self.server_list = {'anonfile': 'https://anonfile.com',
-                        'openload': 'https://openload.cc',
-                       'letsupload': 'https://letsupload.cc',
-                       'megaupload': 'https://megaupload.nz',
-                       'bayfiles': 'https://bayfiles.com'}
+        self.server_list = {'anonfile': 'https://api.anonfiles.com',
+                        'openload': 'https://api.openload.cc',
+                       'letsupload': 'https://api.letsupload.cc',
+                       'megaupload': 'https://api.megaupload.nz',
+                       'bayfiles': 'https://api.bayfiles.com'}
 
         # Api endpoint
         if server not in self.server_list:
@@ -44,7 +44,7 @@ class AnonFile():
             else:
                 self.anonfile_endpoint_url = 'https://api.anonfiles.com'
         else:
-            self.anonfile_endpoint_url = self.server_list[server] + '/api'
+            self.anonfile_endpoint_url = self.server_list[server]
 
         # User specific api key
         self.api_key = '?token=' + api_key
