@@ -38,11 +38,11 @@ class AnonFile():
                        'bayfiles': 'https://api.bayfiles.com'}
 
         # Api endpoint
-        if server not in self.server_list:
-            if uri is not None:
-                self.anonfile_endpoint_url = uri
-            else:
+        if server is None or server not in self.server_list:
+            if uri is None:
                 self.anonfile_endpoint_url = 'https://api.anonfiles.com'
+            else:
+                self.anonfile_endpoint_url = uri
         else:
             self.anonfile_endpoint_url = self.server_list[server]
 
