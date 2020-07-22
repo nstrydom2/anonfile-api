@@ -123,7 +123,6 @@ class AnonFile():
 
         try:
             download_url = scrape_file_location(url)
-            print(f"Download Url: {download_url}")
 
             # download code goes here
             if download_url is not None:
