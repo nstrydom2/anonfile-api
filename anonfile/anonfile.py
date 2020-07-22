@@ -126,8 +126,8 @@ class AnonFile():
             print(f"Download Url: {download_url}")
 
             # download code goes here
-            #if download_url is not None:
-                #wget.download(download_url, location)
+            if download_url is not None:
+                wget.download(download_url, location)
 
         except Exception as ex:
             print("[*] Error -- " + str(ex))
