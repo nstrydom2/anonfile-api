@@ -123,9 +123,7 @@ class AnonFile():
 
         try:
             download_url = scrape_file_location(url)
-            filename = download_url.split("/")[-1]
-            print("Download Url:",download_url)
-            print("Filename:", filename)
+            print(f"Download Url: {download_url}")
 
             # download code goes here
             if download_url is not None:
@@ -134,4 +132,4 @@ class AnonFile():
         except Exception as ex:
             print("[*] Error -- " + str(ex))
             return
-        return filename
+        return download_url
