@@ -1,41 +1,43 @@
- # The MIT License
- #
- # Copyright (c) 2020, Nicholas Bruce Strydom
- #
- # Permission is hereby granted, free of charge, to any person obtaining a copy
- # of this software and associated documentation files (the "Software"), to deal
- # in the Software without restriction, including without limitation the rights
- # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- # copies of the Software, and to permit persons to whom the Software is
- # furnished to do so, subject to the following conditions:
- #
- # The above copyright notice and this permission notice shall be included in
- # all copies or substantial portions of the Software.
- #
- # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- # THE SOFTWARE.
+# The MIT License
+#
+# Copyright (c) 2020, Nicholas Bruce Strydom
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 
 import wget
 import requests
 
 from bs4 import BeautifulSoup
 from functools import wraps
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 
-class AnonFile():
+class AnonFile:
     # Custom timeout needs to be a tuple (connection_timeout, read_timeout)
     def __init__(self, api_key='', server=None, uri=None, custom_timeout=None):
         # openload.cc letsupload.cc megaupload.nz bayfiles.com
         self.server_list = {'anonfile': 'https://api.anonfiles.com',
-                        'openload': 'https://api.openload.cc',
-                       'letsupload': 'https://api.letsupload.cc',
-                       'megaupload': 'https://api.megaupload.nz',
-                       'bayfiles': 'https://api.bayfiles.com'}
+                            'openload': 'https://api.openload.cc',
+                            'letsupload': 'https://api.letsupload.cc',
+                            'megaupload': 'https://api.megaupload.nz',
+                            'bayfiles': 'https://api.bayfiles.com'}
 
         # Api endpoint
         if server is None or server not in self.server_list:
@@ -69,6 +71,7 @@ class AnonFile():
                     raise Exception("Api Key is none, please obtain an Api Key.")
             except Exception as ex:
                 print("[!] Error -- " + str(ex))
+
         return wrapper
 
     def list_servers(self):
@@ -115,8 +118,19 @@ class AnonFile():
         # Scrapes the provided url for the url to the
         # actual file. Only called by 'download_file()'
         def scrape_file_location(url):
+            retry_strategy = Retry(
+                total=3,
+                backoff_factor=1,
+                status_forcelist=[429, 500, 502, 503, 504],
+                method_whitelist=["HEAD", "GET", "OPTIONS"]
+            )
+            adapter = HTTPAdapter(max_retries=retry_strategy)
+            http = requests.Session()
+            http.mount('https://', adapter)
+            http.mount('http://', adapter)
+
             # Get method, retrieving the web page
-            response = requests.get(url, timeout=self.timeout)
+            response = http.get(url, timeout=self.timeout)
             soup = BeautifulSoup(response.text, 'lxml')
 
             return soup.find_all('a')[1].attrs['href']
