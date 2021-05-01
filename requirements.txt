@@ -1,0 +1,11 @@
+beautifulsoup4==4.9.0
+bs4==0.0.1
+certifi==2020.4.5.1
+chardet==3.0.4
+hurry.filesize==0.9
+idna==2.9
+lxml==4.6.3
+python3-wget==0.0.2b1
+requests==2.23.0
+soupsieve==2.0
+urllib3==1.25.8
