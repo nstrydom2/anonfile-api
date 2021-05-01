@@ -20,14 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import wget
-import requests
-
-from bs4 import BeautifulSoup
+import sys
 from functools import wraps
+
+import requests
+import wget
+from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
+__version__ = "0.1.4"
+package_name = "anonfile"
+python_major = "3"
+python_minor = "7"
+
+try:
+    assert sys.version_info >= (int(python_major), int(python_minor))
+except AssertionError:
+    raise RuntimeError(f"The Hentai module requires Python 3.7+ (You have Python {sys.version})")
 
 class AnonFile:
     # Custom timeout needs to be a tuple (connection_timeout, read_timeout)
