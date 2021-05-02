@@ -1,28 +1,28 @@
+#!/usr/bin/env python3
+
 import unittest
-from anonfile import anonfile
-import json
+from pathlib import Path
+
+from src.anonfile import AnonFile
+
+def test_option(token):
+    global TOKEN
+    TOKEN = token
 
 
-class AnonfileTest(unittest.TestCase):
-    # Instantiate the test object
+class TestAnonFile(unittest.TestCase):
     def setUp(self):
-        self.my_api_key = ''
+        self.anon = AnonFile(TOKEN)
+        self.test_file = Path("tests/test.txt")
+        self.test_path = "https://anonfiles.com/9ee1jcu6u9/test_txt"
 
-        self.test_obj = anonfile.AnonFile(self.my_api_key)
+    def test_upload(self):
+        result = self.anon.upload(self.test_file)
+        self.assertTrue(result.status, msg="Expected 200 HTTP Error Code")
+        self.assertTrue(all([result.url.scheme, result.url.netloc, result.url.path]), msg="Invalid URL.")
 
-    def test_returns_success_on_upload_file(self):
-        file = 'F:\\my_test01.txt'
-        status, self.file_obj = self.test_obj.upload_file(file)
-
-        print("[*] File object -- " + json.dumps(self.file_obj))
-
-        assert (status is True)
-        assert (self.file_obj is not None)
-
-        self.test_obj.download_file(self.file_obj)
-
-    def test_returns_file_on_successful_download(self):
-        location = 'E:\\programs\\Python\\anonfile-api\\tests\\my_test01.txt'
-        file_exists = __import__('os').path.isfile(location)
-
-        assert file_exists
+    def test_download(self):
+        result = self.anon.download(self.test_path)
+        self.assertTrue(result.exists(), msg="Download not successful.")
+        self.assertEqual(result.name, self.test_file.name, msg="Different file in download path detected.")
+        result.unlink(missing_ok=True)        
