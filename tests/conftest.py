@@ -5,7 +5,7 @@ def pytest_addoption(parser):
         '--token',
         action='append',
         default=None,
-        help="Secret anonfile.com API token."
+        help="Secret anonfiles.com API token."
     )
 
 def pytest_generate_tests(metafunc):
