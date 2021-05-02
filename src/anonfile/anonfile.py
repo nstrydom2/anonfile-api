@@ -207,7 +207,7 @@ class AnonFile:
     @authenticated
     def download(self, url: str, path: Path=Path.cwd()):
         """
-        Download a file from anonfile.com stored in `url`. Set the download directory
+        Download a file from anonfiles.com stored in `url`. Set the download directory
         in `path` (uses the current working directory by default).
 
         Example
