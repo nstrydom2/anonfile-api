@@ -1,73 +1,86 @@
 # Anonfiles.com Unofficial Python API
 
-This unofficial Python API was created to make uploading and downloading files from Anonfile.com simple, and effective for programming in Python. The goal of the project is to create an intuitive library for anonymous file sharing.
+This unofficial Python API was created to make uploading and downloading files
+from <anonfiles.com> simple and effective for programming in Python. The goal of
+the project is to create an intuitive library for anonymous file sharing.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local
+machine for development and testing purposes. See deployment for notes on how to
+deploy the project on a live system.
 
 ### Prerequisites
 
-Python 3 is required to run this application, other than that there are no prerequisites for the project, as the dependencies are included in the repo along with a virtual environment.
+Python 3.7+ is required to run this application, other than that there are no
+prerequisites for the project, as the dependencies are included in the repository.
 
 ### Installing
 
-To install the library, is as simple as cloning the repo and then importing the module.
+To install the library is as simple as cloning the repository and running
 
-Simply clone the repository.
-
-```
-git clone https://github.com/nstrydom2/anonfile-api.git
+```bash
+pip install -e .
 ```
 
-Or, install the library via Pip.
+It is recommended to create an virtual environment prior to installing this library.
+Alternatively, you can also install this library via Pip:
 
-```
+```bash
 pip install anonfile
 ```
 
 And have fun!
 
-```
-from anonfile.anonfile import AnonFile
-
-anon = AnonFile('api_key')
-status, file_url = anon.upload_file('/home/guest/jims_paperwork.doc')
-```
-
 ## Usage
 
-Just import the module, and then instantiate the AnonFile() object. Finally, start uploading.
+Import the module and instantiate the `AnonFile()` constructor. Setting the download
+directory in `path` is optional.
 
-```
-from anonfile.anonfile import AnonFile
+```python
+from anonfile import AnonFile
 
 anon = AnonFile('api_key')
-status, file_url = anon.upload_file('/home/guest/jims_paperwork.doc')
 
-anon.download_file(file_url)
+# uploading a file
+upload = anon.upload('/home/guest/jims_paperwork.doc')
+print(upload.url.geturl())
+
+# downloading a file
+from pathlib import Path
+
+target_dir = Path.home().joinpath('Downloads')
+filename = anon.download("https://anonfiles.com/9ee1jcu6u9/test_txt", path=target_dir)
+print(filename)
 ```
 
-And voilà, pain free anonymous file sharing. I am also working towards proxy support. If you want some info on the returning JSON object(its going to be the "file" object). Visit [Anonfiles.com](https://anonfiles.com/docs/api). However, the current version just returns the url instead of the full "file" JSON object.
+And voilà, pain-free anonymous file sharing. If you want more information about
+the `AnonFile` API visit [anonfiles.com](https://anonfiles.com/docs/api).
 
 ## Built With
 
 * [Requests](http://docs.python-requests.org/en/master/) - Http for Humans
-* [Anonfiles.com](https://anonfiles.com/docs/api) - AnonFiles.com REST API
+* [anonfiles.com](https://anonfiles.com/docs/api) - AnonFiles.com REST API
 
 ## Versioning
 
-For the versions available, see the [tags on this repository](https://github.com/nstrydom2/anonfile-api/tags). 
+Navigate to [tags on this repository](https://github.com/nstrydom2/anonfile-api/tags)
+to see all available versions.
 
 ## Authors
 
-* **Nicholas Strydom** - nstrydom@gmail.com - [nstrydom2](https://github.com/nstrydom2)
+| Name             | Mail Address                | GitHub Profile                                |
+|------------------|-----------------------------|-----------------------------------------------|
+| Nicholas Strydom | nstrydom@gmail.com          | [nstrydom2](https://github.com/nstrydom2)     |
+| hentai-chan      | dev.hentai-chan@outlook.com | [hentai-chan](https://github.com/hentai-chan) |
 
-See also the list of [contributors](https://github.com/nstrydom2/anonfile-api/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/nstrydom2/anonfile-api/contributors)
+who participated in this project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md)
+license file for more details.
 
 ## Acknowledgments
 
@@ -78,4 +91,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Hat tip to anyone whose code was used
 * Inspiration
 * etc
-
