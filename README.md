@@ -32,6 +32,16 @@ pip install anonfile
 
 And have fun!
 
+### Dev Notes
+
+Run unit tests locally:
+
+```bash
+pytest --verbosity=2 -s --token "REDACTED"
+```
+
+Add the `-k test_*` option if you want to test only a single function.
+
 ## Usage
 
 Import the module and instantiate the `AnonFile()` constructor. Setting the download
