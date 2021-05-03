@@ -55,8 +55,9 @@ except AssertionError:
 
 
 @dataclass(frozen=True)
-class UploadResult:
+class ParseResponse:
     response: Response
+    file_path: Path
 
     @property
     def json(self) -> dict:
@@ -95,21 +96,21 @@ class UploadResult:
         """
         Return the ID (path) of the uploaded file. 
         """
-        return self.json['metadata']['id']
+        return self.json['data']['file']['metadata']['id']
 
     @property
     def name(self) -> Path:
         """
         Return the filename of the uploaded file.
         """
-        return Path(self.json['metadata']['name'])
+        return Path(self.json['data']['file']['metadata']['name'])
 
     @property
     def size(self) -> int:
         """
         Return the uploaded file size in bytes.
         """
-        return int(self.json['metadata']['bytes'])
+        return int(self.json['data']['file']['metadata']['size']['bytes'])
 
     #endregion
 
@@ -177,10 +178,9 @@ class AnonFile:
         return wrapper
 
     @authenticated
-    def upload(self, path: str) -> UploadResult:
+    def upload(self, path: str) -> ParseResponse:
         """
-        Upload the file located in `path` to a previously configured remote
-        server (`Server.ANONFILE` by default).
+        Upload the file located in `path` to http://anonfiles.com.
 
         Example
         -------
@@ -202,13 +202,13 @@ class AnonFile:
                        timeout=self.timeout,
                        proxies=getproxies(),
                        verify=True)
-        return UploadResult(response)
+        return ParseResponse(response, Path(path))
 
     @authenticated
-    def download(self, url: str, path: Path=Path.cwd()):
+    def download(self, url: str, path: Path=Path.cwd()) -> ParseResponse:
         """
-        Download a file from anonfiles.com stored in `url`. Set the download directory
-        in `path` (uses the current working directory by default).
+        Download a file from https://anonfiles.com given a `url`. Set the download
+        directory in `path` (uses the current working directory by default).
 
         Example
         -------
@@ -222,16 +222,17 @@ class AnonFile:
         file = anon.download("https://anonfiles.com/9ee1jcu6u9/test_txt", target_dir)
         ```
         """
-        response = self.session.get(url, timeout=self.timeout, proxies=getproxies())
-        response.encoding = 'utf-8'
-        
-        html_ = HTML(html=html.unescape(response.text))        
+        get = lambda url, **kwargs: self.session.get(url, timeout=self.timeout, proxies=getproxies(), **kwargs)
+
+        info = get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info"))
+        info.encoding = 'utf-8'
+       
+        html_ = HTML(html=html.unescape(get(url).text))   
         download_link = next(filter(lambda link: 'cdn' in link, html_.absolute_links))
-        file_path = path.joinpath(Path(urlparse(download_link).path).name)
-        stream = self.session.get(download_link, timeout=self.timeout, proxies=getproxies(), stream=True)
+        file_path = path.joinpath(Path(urlparse(download_link).path).name)        
 
         with open(file_path, mode='wb') as file_handler:
-            for chunk in stream.iter_content(1024):
+            for chunk in get(download_link, stream=True).iter_content(1024):
                 file_handler.write(chunk)
 
-        return file_path
+        return ParseResponse(info, file_path)
