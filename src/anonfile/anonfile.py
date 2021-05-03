@@ -219,7 +219,9 @@ class AnonFile:
 
         anon = AnonFile('my_token')
         target_dir = Path.home().joinpath('Downloads')
-        file = anon.download("https://anonfiles.com/9ee1jcu6u9/test_txt", target_dir)
+        result = anon.download("https://anonfiles.com/9ee1jcu6u9/test_txt", target_dir)
+        # WindowsPath('C:/Users/username/Downloads/test.txt')
+        print(result.file_path)
         ```
         """
         get = lambda url, **kwargs: self.session.get(url, timeout=self.timeout, proxies=getproxies(), **kwargs)
