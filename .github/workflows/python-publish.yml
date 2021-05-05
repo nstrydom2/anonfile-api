@@ -5,7 +5,7 @@ name: PyPI
 
 on:
   release:
-    types: [created]
+    types: [published, edited]
 
 jobs:
   deploy:
