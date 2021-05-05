@@ -25,4 +25,4 @@ class TestAnonFile(unittest.TestCase):
         result = self.anon.download(self.test_path)
         self.assertTrue(result.file_path.exists(), msg="Download not successful.")
         self.assertEqual(result.file_path.name, self.test_file.name, msg="Different file in download path detected.")
-        result.file_path.unlink(missing_ok=True)   
+        result.file_path.unlink()
