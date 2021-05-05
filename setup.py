@@ -51,7 +51,7 @@ setup(
         "Natural Language :: English",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries",
-        "Topic :: Utilities"
+        "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
