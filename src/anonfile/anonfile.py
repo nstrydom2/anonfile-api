@@ -43,7 +43,7 @@ from requests.models import Response
 from requests_html import HTML
 from urllib3 import Retry
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 package_name = "anonfile"
 python_major = "3"
 python_minor = "7"
