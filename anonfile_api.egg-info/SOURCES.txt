@@ -1,8 +1,0 @@
-README.md
-anonfile_api
-setup.py
-anonfile_api.egg-info/PKG-INFO
-anonfile_api.egg-info/SOURCES.txt
-anonfile_api.egg-info/dependency_links.txt
-anonfile_api.egg-info/requires.txt
-anonfile_api.egg-info/top_level.txt
