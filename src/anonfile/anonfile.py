@@ -27,6 +27,7 @@ THE SOFTWARE.
 from __future__ import annotations
 
 import html
+import re
 import sys
 from dataclasses import dataclass
 from functools import wraps
@@ -40,10 +41,9 @@ from faker import Faker
 from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.models import Response
-from requests_html import HTML
 from urllib3 import Retry
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 package_name = "anonfile"
 python_major = "3"
 python_minor = "7"
@@ -62,7 +62,7 @@ class ParseResponse:
     @property
     def json(self) -> dict:
         """
-        Return the entire POST response.
+        Return the entire HTTP response.
         """
         return self.response.json()
 
@@ -126,7 +126,7 @@ class AnonFile:
     __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor']
 
     def __init__(self, 
-                 token: str,
+                 token: str="",
                  timeout: Tuple[float,float]=_timeout,
                  total: int=_total,
                  status_forcelist: List[int]=_status_forcelist,
@@ -153,7 +153,7 @@ class AnonFile:
     @property
     def session(self) -> Session:
         """
-        Creates a custom session object. A request session provides cookie
+        Create a custom session object. A request session provides cookie
         persistence, connection-pooling, and further configuration options.
         """
         assert_status_hook = lambda response, *args, **kwargs: response.raise_for_status()
@@ -180,7 +180,7 @@ class AnonFile:
     @authenticated
     def upload(self, path: str) -> ParseResponse:
         """
-        Upload the file located in `path` to http://anonfiles.com.
+        Upload a file located in `path` to http://anonfiles.com.
 
         Example
         -------
@@ -194,6 +194,11 @@ class AnonFile:
         # https://anonfiles.com/9ee1jcu6u9/test_txt
         print(result.url.geturl())
         ```
+
+        Note
+        ----
+        - `AnonFile` offers unlimited bandwidth
+        - Uploads cannot exceed a file size of 20G
         """
         response = self.session.post(
                        urljoin(AnonFile.API, 'upload'),
@@ -228,10 +233,10 @@ class AnonFile:
 
         info = get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info"))
         info.encoding = 'utf-8'
-       
-        html_ = HTML(html=html.unescape(get(url).text))   
-        download_link = next(filter(lambda link: 'cdn' in link, html_.absolute_links))
-        file_path = path.joinpath(Path(urlparse(download_link).path).name)        
+
+        links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(get(url).text), re.I)
+        download_link = next(filter(lambda link: 'cdn-' in link, links))
+        file_path = path.joinpath(Path(urlparse(download_link).path).name)
 
         with open(file_path, mode='wb') as file_handler:
             for chunk in get(download_link, stream=True).iter_content(1024):
