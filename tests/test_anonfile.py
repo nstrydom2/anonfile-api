@@ -5,14 +5,15 @@ from pathlib import Path
 
 from src.anonfile import AnonFile
 
+TOKEN = None
+
 def test_option(token):
-    global TOKEN
     TOKEN = token
 
 
 class TestAnonFile(unittest.TestCase):
     def setUp(self):
-        self.anon = AnonFile(TOKEN)
+        self.anon = AnonFile(TOKEN) if TOKEN else AnonFile()
         self.test_file = Path("tests/test.txt")
         self.test_path = "https://anonfiles.com/93k5x1ucu0/test_txt"
 
