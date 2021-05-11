@@ -27,6 +27,7 @@ THE SOFTWARE.
 from __future__ import annotations
 
 import html
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -41,6 +42,8 @@ from faker import Faker
 from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.models import Response
+from tqdm import tqdm
+from tqdm.utils import CallbackIOWrapper
 from urllib3 import Retry
 
 __version__ = "0.2.3"
@@ -137,6 +140,23 @@ class AnonFile:
         self.status_forcelist = status_forcelist,
         self.backoff_factor = backoff_factor
 
+    @staticmethod
+    def __progressbar_options(iterable, desc, unit, color: str="\033[32m", char='\u25CB', total=None, disable=False) -> dict:
+        """
+        Return custom optional arguments for `tqdm` progressbars.
+        """
+        return {
+            'iterable': iterable,
+            'bar_format': "{l_bar}%s{bar}%s{r_bar}" % (color, "\033[0m"),
+            'ascii': char.rjust(9, ' '), 
+            'desc': desc, 
+            'unit': unit.rjust(1, ' '), 
+            'unit_scale': True,
+            'unit_divisor': 1024,
+            'total': len(iterable) if total is None else total, 
+            'disable': not disable
+        }
+
     @property
     def retry_strategy(self) -> Retry:
         """
@@ -178,7 +198,7 @@ class AnonFile:
         return wrapper
 
     @authenticated
-    def upload(self, path: str) -> ParseResponse:
+    def upload(self, path: str, progressbar: bool=False) -> ParseResponse:
         """
         Upload a file located in `path` to http://anonfiles.com.
 
@@ -200,17 +220,23 @@ class AnonFile:
         - `AnonFile` offers unlimited bandwidth
         - Uploads cannot exceed a file size of 20G
         """
-        response = self.session.post(
-                       urljoin(AnonFile.API, 'upload'),
-                       params={'token': self.token},
-                       files={'file': open(path, mode='rb')},
-                       timeout=self.timeout,
-                       proxies=getproxies(),
-                       verify=True)
-        return ParseResponse(response, Path(path))
+        size = os.stat(path).st_size
+        options = AnonFile.__progressbar_options(None, f"Upload: {Path(path).name}", unit='B', total=size, disable=progressbar)
+        with open(path, mode='rb') as file_handler:
+            with tqdm(**options) as tqdm_handler:
+                response = self.session.post(
+                    urljoin(AnonFile.API, 'upload'),
+                    params={'token': self.token},
+                    files={'file': CallbackIOWrapper(tqdm_handler.update, file_handler, 'read')},
+                    timeout=self.timeout,
+                    proxies=getproxies(),
+                    verify=True
+                )
+        
+                return ParseResponse(response, Path(path))
 
     @authenticated
-    def download(self, url: str, path: Path=Path.cwd()) -> ParseResponse:
+    def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False) -> ParseResponse:
         """
         Download a file from https://anonfiles.com given a `url`. Set the download
         directory in `path` (uses the current working directory by default).
@@ -237,9 +263,13 @@ class AnonFile:
         links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(get(url).text), re.I)
         download_link = next(filter(lambda link: 'cdn-' in link, links))
         file_path = path.joinpath(Path(urlparse(download_link).path).name)
+        download = ParseResponse(info, file_path)
 
+        options = AnonFile.__progressbar_options(None, f"Download {download.id}", unit='B', total=download.size, disable=progressbar)
         with open(file_path, mode='wb') as file_handler:
-            for chunk in get(download_link, stream=True).iter_content(1024):
-                file_handler.write(chunk)
+            with tqdm(**options) as tqdm_handler:
+                for chunk in get(download_link, stream=True).iter_content(1024):                
+                    tqdm_handler.update(len(chunk))
+                    file_handler.write(chunk)
 
-        return ParseResponse(info, file_path)
+        return download
