@@ -43,7 +43,7 @@ And have fun!
 Run unit tests locally:
 
 ```bash
-pytest --verbosity=2 -s --token "REDACTED"
+pytest --verbosity=2 -s [--token "REDACTED"]
 ```
 
 Add the `-k test_*` option if you want to test only a single function.
@@ -58,13 +58,12 @@ from anonfile import AnonFile
 
 anon = AnonFile('api_key')
 
-# uploading a file
-upload = anon.upload('/home/guest/jims_paperwork.doc')
+# upload a file and enable progressbar terminal feedback
+upload = anon.upload('/home/guest/jims_paperwork.doc', progressbar=True)
 print(upload.url.geturl())
 
-# downloading a file
+# download a file and set the download directory
 from pathlib import Path
-
 target_dir = Path.home().joinpath('Downloads')
 filename = anon.download("https://anonfiles.com/9ee1jcu6u9/test_txt", path=target_dir)
 print(filename)
@@ -73,9 +72,24 @@ print(filename)
 And voilà, pain-free anonymous file sharing. If you want more information about
 the `AnonFile` API visit [anonfiles.com](https://anonfiles.com/docs/api).
 
+## Command Line Interface
+
+```bash
+# get help
+anonfile [download|upload] --help
+
+# 1. enable verbose for progress bar feedback, else run silent
+# 2. both methods expect at least one argument
+
+anonfile --verbose download --url https://anonfiles.com/93k5x1ucu0/test_txt
+
+anonfile --verbose upload --file ./test.txt
+```
+
 ## Built With
 
 * [Requests](http://docs.python-requests.org/en/master/) - Http for Humans
+* [TQDM](https://github.com/tqdm/tqdm) - Fast & Extensible Progress Bars
 * [anonfiles.com](https://anonfiles.com/docs/api) - AnonFiles.com REST API
 
 ## Versioning
