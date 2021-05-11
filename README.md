@@ -51,12 +51,14 @@ Add the `-k test_*` option if you want to test only a single function.
 ## Usage
 
 Import the module and instantiate the `AnonFile()` constructor. Setting the download
-directory in `path` is optional.
+directory in `path` is optional. Using the API `token` in the constructor is optional
+as well. A valid `token` registers all file uploads online, i.e. a list of all uploaded
+files is made accessible to any user that [signs into your account](https://anonfiles.com/login).
 
 ```python
 from anonfile import AnonFile
 
-anon = AnonFile('api_key')
+anon = AnonFile()
 
 # upload a file and enable progressbar terminal feedback
 upload = anon.upload('/home/guest/jims_paperwork.doc', progressbar=True)
