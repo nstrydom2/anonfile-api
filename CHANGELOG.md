@@ -1,6 +1,31 @@
 
 # Changelog
 
+## Version 0.2.3 (2021-5-11)
+
+- Adds a rudimentary CLI
+- Removes `requests_html` as dependency and improves download performance
+- Adds `tqdm` progressbar support to `upload` and `download`
+
+```bash
+# get help
+anonfile [download|upload] --help
+
+# 1. enable verbose for progressbar feedback, else run silent
+# 2. both methods expect at least one argument
+
+anonfile --verbose download --url https://anonfiles.com/93k5x1ucu0/test_txt
+
+anonfile --verbose upload --file ./test.txt
+```
+
+## Version 0.2.2 (2021-5-05)
+
+- **NOTE** Version `0.2.1` was skipped due to a technical mistake
+- Unit Tests are now compatible with Python 3.7
+- Upgrades `importlib-metadata` dependency to version 4.0.1 in `requirements/release.txt`
+- Fixes an error in `setup.py`
+
 ## Version 0.2.0 (2021-05-04)
 
 - **IMPORTANT:** This is a major update to the client-facing library interface
