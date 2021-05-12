@@ -4,7 +4,7 @@ def pytest_addoption(parser):
     parser.addoption(
         '--token',
         action='append',
-        default=None,
+        default=["REDACTED"],
         help="Secret anonfiles.com API token."
     )
 

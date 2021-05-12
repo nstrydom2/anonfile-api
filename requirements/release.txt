@@ -1,4 +1,4 @@
 requests==2.25.1
-requests_html==0.10.0
+tqdm==4.60.0
 faker==8.1.2
 importlib-metadata==4.0.1

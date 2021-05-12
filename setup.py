@@ -34,7 +34,7 @@ setup(
     project_urls={
         'Source Code': "https://github.com/nstrydom2/anonfile-api",
         'Bug Reports': "https://github.com/nstrydom2/anonfile-api/issues",
-        'Changelog': "https://github.com/nstrydom2/anonfile-api/blob/master/changelog"
+        'Changelog': "https://github.com/nstrydom2/anonfile-api/blob/master/CHANGELOG.md"
     },    
     python_requires=">=%d.%d" % (python_major, python_minor),
     install_requires=packages,
@@ -44,9 +44,13 @@ setup(
     },
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
+    entry_points={
+        'console_scripts': ['%s=%s.__init__:main' % (package_name, package_name)]
+    },
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
