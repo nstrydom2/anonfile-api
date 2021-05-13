@@ -46,7 +46,7 @@ from tqdm import tqdm
 from tqdm.utils import CallbackIOWrapper
 from urllib3 import Retry
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 package_name = "anonfile"
 python_major = "3"
 python_minor = "7"
