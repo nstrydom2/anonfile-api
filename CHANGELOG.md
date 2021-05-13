@@ -1,7 +1,7 @@
 
 # Changelog
 
-## Version 0.2.3 (2021-5-11)
+## Version 0.2.3 (2021-5-13)
 
 - Adds a rudimentary CLI
 - Removes `requests_html` as dependency and improves download performance
@@ -18,6 +18,8 @@ anonfile --verbose download --url https://anonfiles.com/93k5x1ucu0/test_txt
 
 anonfile --verbose upload --file ./test.txt
 ```
+
+- Upgrades `faker` dependency from 8.1.2 to 8.1.3
 
 ## Version 0.2.2 (2021-5-05)
 
