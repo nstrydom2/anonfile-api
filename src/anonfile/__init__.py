@@ -46,10 +46,6 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(2)
 
-    except Exception as ex:
-        print(f"error: {ex}")
-        sys.exit(1)
-
 
 if __name__ == '__main__':
     main()
