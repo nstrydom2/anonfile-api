@@ -1,8 +1,9 @@
 
 # Changelog
 
-## Version 0.2.3 (2021-5-13)
+## Version 0.2.4 (2021-5-13)
 
+- **NOTE** Version `0.2.3` was skipped due to a technical mistake
 - Adds a rudimentary CLI
 - Removes `requests_html` as dependency and improves download performance
 - Adds `tqdm` progressbar support to `upload` and `download`
