@@ -7,16 +7,12 @@ on:
   push:
     branches:
       - master
-      - v0_2_*
       - rec-*
       - dev-*
   pull_request:
     branches:
       - master
-      - v0_2_*
-      - rec-*
-      - dev-*
-      - dependabot/*
+
 jobs:
   build:
 
