@@ -42,11 +42,11 @@ from faker import Faker
 from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.models import Response
+from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 from tqdm import tqdm
-from tqdm.utils import CallbackIOWrapper
 from urllib3 import Retry
 
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 package_name = "anonfile"
 python_major = "3"
 python_minor = "7"
@@ -197,6 +197,11 @@ class AnonFile:
                 print(exception, file=sys.stderr)
         return wrapper
 
+    @staticmethod
+    def __callback(monitor: MultipartEncoderMonitor, tqdm_handler: tqdm):
+        tqdm_handler.total = monitor.len
+        tqdm_handler.update(monitor.bytes_read - tqdm_handler.n)
+
     @authenticated
     def upload(self, path: str, progressbar: bool=False) -> ParseResponse:
         """
@@ -223,11 +228,14 @@ class AnonFile:
         size = os.stat(path).st_size
         options = AnonFile.__progressbar_options(None, f"Upload: {Path(path).name}", unit='B', total=size, disable=progressbar)
         with open(path, mode='rb') as file_handler:
+            encoder = MultipartEncoder(fields={'file': (Path(path).name, file_handler)})
             with tqdm(**options) as tqdm_handler:
+                encoder_monitor = MultipartEncoderMonitor(encoder, callback=lambda monitor: AnonFile.__callback(monitor, tqdm_handler))
                 response = self.session.post(
                     urljoin(AnonFile.API, 'upload'),
+                    data=encoder_monitor,
                     params={'token': self.token},
-                    files={'file': CallbackIOWrapper(tqdm_handler.update, file_handler, 'read')},
+                    headers={'Content-Type': encoder_monitor.content_type},
                     timeout=self.timeout,
                     proxies=getproxies(),
                     verify=True
