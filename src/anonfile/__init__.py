@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import sys
 from pathlib import Path
 
 from .anonfile import *
@@ -45,6 +46,8 @@ def main():
         print(f"error: {bad_human}")
         parser.print_help(sys.stderr)
         sys.exit(2)
+    except Exception as error:
+        print(error, file=sys.stderr)
 
 
 if __name__ == '__main__':
