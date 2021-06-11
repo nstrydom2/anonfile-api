@@ -38,11 +38,10 @@ from urllib.parse import ParseResult, urljoin, urlparse
 from urllib.request import getproxies
 
 import requests
-from faker import Faker
 from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.models import Response
-from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
+from requests_toolbelt import MultipartEncoderMonitor, user_agent
 from tqdm import tqdm
 from urllib3 import Retry
 
@@ -122,7 +121,6 @@ class AnonFile:
     _total = 5
     _status_forcelist = [413, 429, 500, 502, 503, 504]
     _backoff_factor = 1
-    _fake = Faker()
 
     API = "https://api.anonfiles.com/"
 
@@ -181,7 +179,7 @@ class AnonFile:
         session.mount("https://", HTTPAdapter(max_retries=self.retry_strategy))
         session.hooks['response'] = [assert_status_hook]
         session.headers.update({
-            "User-Agent" : AnonFile._fake.chrome(version_from=80, version_to=86, build_from=4100, build_to=4200)
+            'User-Agent' : user_agent(package_name, __version__)
         })
         return session
 
@@ -199,6 +197,9 @@ class AnonFile:
 
     @staticmethod
     def __callback(monitor: MultipartEncoderMonitor, tqdm_handler: tqdm):
+        """
+        Define a multi part encoder monitor callback function for the upload method.
+        """
         tqdm_handler.total = monitor.len
         tqdm_handler.update(monitor.bytes_read - tqdm_handler.n)
 
@@ -228,9 +229,9 @@ class AnonFile:
         size = os.stat(path).st_size
         options = AnonFile.__progressbar_options(None, f"Upload: {Path(path).name}", unit='B', total=size, disable=progressbar)
         with open(path, mode='rb') as file_handler:
-            encoder = MultipartEncoder(fields={'file': (Path(path).name, file_handler)})
+            fields = {'file': (Path(path).name, file_handler, 'application/octet-stream')}
             with tqdm(**options) as tqdm_handler:
-                encoder_monitor = MultipartEncoderMonitor(encoder, callback=lambda monitor: AnonFile.__callback(monitor, tqdm_handler))
+                encoder_monitor = MultipartEncoderMonitor.from_fields(fields, callback=lambda monitor: AnonFile.__callback(monitor, tqdm_handler))
                 response = self.session.post(
                     urljoin(AnonFile.API, 'upload'),
                     data=encoder_monitor,
