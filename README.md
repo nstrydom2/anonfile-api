@@ -1,4 +1,5 @@
 # Anonfiles.com Unofficial Python API
+
 [![PyPI version shields.io](https://img.shields.io/pypi/v/anonfile)](https://pypi.python.org/pypi/anonfile/)
 [![CI](https://github.com/nstrydom2/anonfile-api/actions/workflows/python-package.yml/badge.svg?branch=master)](https://github.com/nstrydom2/anonfile-api/actions/workflows/python-package.yml)
 [![PyPI download total](https://img.shields.io/pypi/dm/anonfile)](https://pypi.python.org/pypi/anonfile/)
@@ -23,27 +24,27 @@ prerequisites for the project, as the dependencies are included in the repositor
 
 ### Installing
 
-To install the library is as simple as cloning the repository and running
-
-```bash
-pip install -e .
-```
-
-It is recommended to create an virtual environment prior to installing this library.
-Alternatively, you can also install this library via Pip:
+To install the library is as simple as running
 
 ```bash
 pip install anonfile
 ```
 
-And have fun!
+from the command line. To install this library in debug mode, use
+
+```bash
+pip install -e .
+```
+
+instead. It is recommended to create an virtual environment prior
+to installing this library.
 
 ### Dev Notes
 
 Run unit tests locally:
 
 ```bash
-pytest --verbosity=2 -s [--token "REDACTED"]
+pytest --verbose -s [--token "REDACTED"]
 ```
 
 Add the `-k test_*` option if you want to test only a single function.
