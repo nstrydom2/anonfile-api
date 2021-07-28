@@ -1,6 +1,11 @@
 
 # Changelog
 
+## Version 0.2.5 (2021-7-28)
+
+- Updates requests and requests-toolbelt dependencies
+- Modified test_anonfile.py to be more robust by adding a test for .mkv video format (see also: #50 )
+
 ## Version 0.2.4 (2021-5-13)
 
 - **NOTE** Version `0.2.3` was skipped due to a technical mistake
