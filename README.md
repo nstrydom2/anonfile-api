@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://github.com/nstrydom2/anonfile-api" title="Project Logo">
+    <img height="150" style="margin-top:15px" src="https://raw.githubusercontent.com/nstrydom2/anonfile-api/master/logo.svg">
+  </a>
+</p>
+
 # Anonfiles.com Unofficial Python API
 
 [![PyPI version shields.io](https://img.shields.io/pypi/v/anonfile)](https://pypi.python.org/pypi/anonfile/)
