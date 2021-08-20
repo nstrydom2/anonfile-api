@@ -27,7 +27,9 @@ THE SOFTWARE.
 from __future__ import annotations
 
 import html
+import logging
 import os
+import platform
 import re
 import sys
 from dataclasses import dataclass
@@ -45,7 +47,7 @@ from requests_toolbelt import MultipartEncoderMonitor, user_agent
 from tqdm import tqdm
 from urllib3 import Retry
 
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 package_name = "anonfile"
 python_major = "3"
 python_minor = "7"
@@ -53,8 +55,38 @@ python_minor = "7"
 try:
     assert sys.version_info >= (int(python_major), int(python_minor))
 except AssertionError:
-    raise RuntimeError(f"{package_name!r} requires Python {python_major}.{python_minor}+ (You have Python {sys.version})")
+    raise RuntimeError(f"\033[31m{package_name!r} requires Python {python_major}.{python_minor}+ (You have Python {sys.version})\033[0m")
 
+#region logging
+
+def get_config_dir(package_name: str) -> Path:
+    """
+    Return a platform-specific root directory for user configuration files.
+    """
+    return {
+        'Windows': Path(os.path.expandvars('%LOCALAPPDATA%')),
+        'Darwin': Path.home().joinpath('Library').joinpath('Application Support'),
+        'Linux': Path.home().joinpath('.config')
+    }[platform.system()].joinpath(package_name)
+
+def get_logfile_path(package_name: str) -> Path:
+    """
+    Return a platform-specific log file path.
+    """
+    config_dir = get_config_dir(package_name)
+    config_dir.mkdir(parents=True, exist_ok=True)
+    log_file = config_dir.joinpath("anonfile.log")
+    log_file.touch(exist_ok=True)
+    return log_file
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s::%(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+file_handler = logging.FileHandler(get_logfile_path(package_name))
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+#endregion
 
 @dataclass(frozen=True)
 class ParseResponse:
@@ -96,7 +128,7 @@ class ParseResponse:
     @property
     def id(self) -> str:
         """
-        Return the ID (path) of the uploaded file. 
+        Return the ID (path) of the uploaded file.
         """
         return self.json['data']['file']['metadata']['id']
 
@@ -126,7 +158,7 @@ class AnonFile:
 
     __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor']
 
-    def __init__(self, 
+    def __init__(self,
                  token: str="",
                  timeout: Tuple[float,float]=_timeout,
                  total: int=_total,
@@ -146,12 +178,12 @@ class AnonFile:
         return {
             'iterable': iterable,
             'bar_format': "{l_bar}%s{bar}%s{r_bar}" % (color, "\033[0m"),
-            'ascii': char.rjust(9, ' '), 
-            'desc': desc, 
-            'unit': unit.rjust(1, ' '), 
+            'ascii': char.rjust(9, ' '),
+            'desc': desc,
+            'unit': unit.rjust(1, ' '),
             'unit_scale': True,
             'unit_divisor': 1024,
-            'total': len(iterable) if total is None else total, 
+            'total': len(iterable) if total is None else total,
             'disable': not disable
         }
 
@@ -160,8 +192,8 @@ class AnonFile:
         """
         The retry strategy returns the retry configuration made up of the
         number of total retries, the status forcelist as well as the backoff
-        factor. It is used in the session property where these values are 
-        passed to the HTTPAdapter. 
+        factor. It is used in the session property where these values are
+        passed to the HTTPAdapter.
         """
         return Retry(total=self.total,
             status_forcelist=self.status_forcelist,
@@ -204,9 +236,10 @@ class AnonFile:
         tqdm_handler.update(monitor.bytes_read - tqdm_handler.n)
 
     @authenticated
-    def upload(self, path: str, progressbar: bool=False) -> ParseResponse:
+    def upload(self, path: str, progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
-        Upload a file located in `path` to http://anonfiles.com.
+        Upload a file located in `path` to http://anonfiles.com. Set
+        `enable_logging` to `True` to store the URL in a global config file.
 
         Example
         -------
@@ -241,14 +274,15 @@ class AnonFile:
                     proxies=getproxies(),
                     verify=True
                 )
-        
+                logger.log(logging.INFO if enable_logging else logging.NOTSET, "upload::%s", response.json()['data']['file']['url']['full'])
                 return ParseResponse(response, Path(path))
 
     @authenticated
-    def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False) -> ParseResponse:
+    def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
         Download a file from https://anonfiles.com given a `url`. Set the download
-        directory in `path` (uses the current working directory by default).
+        directory in `path` (uses the current working directory by default). Set
+        `enable_logging` to `True` to store the URL in a global config file.
 
         Example
         -------
@@ -277,8 +311,9 @@ class AnonFile:
         options = AnonFile.__progressbar_options(None, f"Download {download.id}", unit='B', total=download.size, disable=progressbar)
         with open(file_path, mode='wb') as file_handler:
             with tqdm(**options) as tqdm_handler:
-                for chunk in get(download_link, stream=True).iter_content(1024):                
+                for chunk in get(download_link, stream=True).iter_content(1024):
                     tqdm_handler.update(len(chunk))
                     file_handler.write(chunk)
 
+        logger.log(logging.INFO if enable_logging else logging.NOTSET, "download::%s", url)
         return download
