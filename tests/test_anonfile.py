@@ -23,18 +23,18 @@ class TestAnonFile(unittest.TestCase):
         self.test_med_file = "https://anonfiles.com/b7NaVd0cu3/topsecret_mkv"
 
     def test_upload(self):
-        upload = self.anon.upload(self.test_file, progressbar=True)
+        upload = self.anon.upload(self.test_file, progressbar=True, enable_logging=True)
         self.assertTrue(upload.status, msg="Expected 200 HTTP Error Code")
         self.assertTrue(all([upload.url.scheme, upload.url.netloc, upload.url.path]), msg="Invalid URL.")
 
     def test_download(self):
-        download = self.anon.download(self.test_small_file, progressbar=True)
+        download = self.anon.download(self.test_small_file, progressbar=True, enable_logging=True)
         self.assertTrue(download.file_path.exists(), msg="Download not successful.")
         self.assertEqual(download.file_path.name, self.test_file.name, msg="Different file in download path detected.")
         download.file_path.unlink()
 
     def test_multipart_encoded_files(self):
         # use pre-computed checksum for faster unit tests
-        download = self.anon.download(self.test_med_file, progressbar=True)
+        download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
         self.assertEqual("06b6a6bea6ba82900d144d3b38c65347", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
         download.file_path.unlink()
