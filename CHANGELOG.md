@@ -1,6 +1,30 @@
 
 # Changelog
 
+## Version 0.2.6 (2021-8-21)
+
+Adds the `enable_logging` parameter to the upload and download method. This feature
+stores the target URL in a global configuration file. It's located in
+
+- **Windows:** `%LOCALAPPDATA%/anonfile`
+- **Darwin:** `$HOME/Library/Application Support/anonfile`
+- **Linux:** `$HOME/.config/anonfile`
+
+There are two functions you can use to easily access these paths in code:
+
+```python
+from anonfile import get_config_dir, get_logfile_path
+
+config_dir, logfile = get_config_dir(), get_logilfe_path()
+
+print(f"{config_dir=}\n{logfile=}")
+```
+
+This feature is turned off by default in the library, and turned on by default
+in the built-in CLI. Furthermore, the `--verbose` option is now also turned on by
+default in the CLI; if that's something you don't want you can turn it off again
+using the `--no-verbose` flag.
+
 ## Version 0.2.5 (2021-7-28)
 
 - Updates requests and requests-toolbelt dependencies

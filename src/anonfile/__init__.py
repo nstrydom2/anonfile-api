@@ -14,7 +14,8 @@ def main():
     parser._optionals.title = 'Arguments'
 
     parser.add_argument('-v', '--version', action='version', version=f"%(prog)s {__version__}")
-    parser.add_argument('-V', '--verbose', action='store_true', help="increase output verbosity")
+    parser.add_argument('-V', '--verbose', default=True, action=argparse.BooleanOptionalAction, help="increase output verbosity")
+    parser.add_argument('-l', '--logging', default=True, action=argparse.BooleanOptionalAction, help="enable URL logging")
     parser.add_argument('-t', '--token', type=str, default='secret', help="configure an API token (optional)")
 
     subparser = parser.add_subparsers(dest='command')
@@ -34,12 +35,12 @@ def main():
 
         if args.command == 'upload':
             for file in args.file:
-                upload = anon.upload(file, progressbar=args.verbose)
+                upload = anon.upload(file, progressbar=args.verbose, enable_logging=args.logging)
                 print(f"URL: {upload.url.geturl()}")
 
         if args.command == 'download':
             for url in args.url:
-                download = anon.download(url, args.path, progressbar=args.verbose)
+                download = anon.download(url, args.path, progressbar=args.verbose, enable_logging=args.logging)
                 print(f"File: {download.file_path}")
 
     except UserWarning as bad_human:

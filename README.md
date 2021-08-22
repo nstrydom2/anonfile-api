@@ -87,12 +87,9 @@ the `AnonFile` API visit [anonfiles.com](https://anonfiles.com/docs/api).
 # get help
 anonfile [download|upload] --help
 
-# 1. enable verbose for progress bar feedback, else run silent
-# 2. both methods expect at least one argument
-
-anonfile --verbose download --url https://anonfiles.com/93k5x1ucu0/test_txt
-
-anonfile --verbose upload --file ./test.txt
+# note: both methods expect at least one argument, but can take on more
+anonfile download --url https://anonfiles.com/93k5x1ucu0/test_txt
+anonfile upload --file ./test.txt
 ```
 
 ## Built With
