@@ -33,7 +33,6 @@ import platform
 import re
 import sys
 from dataclasses import dataclass
-from functools import wraps
 from pathlib import Path
 from typing import List, Tuple
 from urllib.parse import ParseResult, urljoin, urlparse
@@ -159,7 +158,7 @@ class AnonFile:
     __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor']
 
     def __init__(self,
-                 token: str="",
+                 token: str="undefined",
                  timeout: Tuple[float,float]=_timeout,
                  total: int=_total,
                  status_forcelist: List[int]=_status_forcelist,
@@ -215,18 +214,6 @@ class AnonFile:
         })
         return session
 
-    def authenticated(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            try:
-                if self.token is not None:
-                    return func(self, *args, **kwargs)
-                else:
-                    raise Exception("[!] Error: API key is not configured.")
-            except Exception as exception:
-                print(exception, file=sys.stderr)
-        return wrapper
-
     @staticmethod
     def __callback(monitor: MultipartEncoderMonitor, tqdm_handler: tqdm):
         """
@@ -235,7 +222,6 @@ class AnonFile:
         tqdm_handler.total = monitor.len
         tqdm_handler.update(monitor.bytes_read - tqdm_handler.n)
 
-    @authenticated
     def upload(self, path: str, progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
         Upload a file located in `path` to http://anonfiles.com. Set
@@ -277,7 +263,6 @@ class AnonFile:
                 logger.log(logging.INFO if enable_logging else logging.NOTSET, "upload::%s", response.json()['data']['file']['url']['full'])
                 return ParseResponse(response, Path(path))
 
-    @authenticated
     def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
         Download a file from https://anonfiles.com given a `url`. Set the download
