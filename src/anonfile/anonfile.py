@@ -46,7 +46,7 @@ from requests_toolbelt import MultipartEncoderMonitor, user_agent
 from tqdm import tqdm
 from urllib3 import Retry
 
-__version__ = "0.2.6"
+__version__ = "0.2.7"
 package_name = "anonfile"
 python_major = "3"
 python_minor = "7"
@@ -91,6 +91,7 @@ logger.addHandler(file_handler)
 class ParseResponse:
     response: Response
     file_path: Path
+    ddl: str
 
     @property
     def json(self) -> dict:
@@ -194,10 +195,7 @@ class AnonFile:
         factor. It is used in the session property where these values are
         passed to the HTTPAdapter.
         """
-        return Retry(total=self.total,
-            status_forcelist=self.status_forcelist,
-            backoff_factor=self.backoff_factor
-        )
+        return Retry(total=self.total, status_forcelist=self.status_forcelist, backoff_factor=self.backoff_factor)
 
     @property
     def session(self) -> Session:
@@ -205,14 +203,22 @@ class AnonFile:
         Create a custom session object. A request session provides cookie
         persistence, connection-pooling, and further configuration options.
         """
-        assert_status_hook = lambda response, *args, **kwargs: response.raise_for_status()
         session = requests.Session()
         session.mount("https://", HTTPAdapter(max_retries=self.retry_strategy))
-        session.hooks['response'] = [assert_status_hook]
+        session.hooks['response'] = [lambda response, *args, **kwargs: response.raise_for_status()]
         session.headers.update({
             'User-Agent' : user_agent(package_name, __version__)
         })
         return session
+
+    def __get(self, url: str, **kwargs) -> Response:
+        """
+        Returns the GET request encoded in `utf-8`. Adds proxies to this session
+        on the fly if urllib is able to pick up the system's proxy settings.
+        """
+        response = self.session.get(url, timeout=self.timeout, proxies=getproxies(), **kwargs)
+        response.encoding = 'utf-8'
+        return response
 
     @staticmethod
     def __callback(monitor: MultipartEncoderMonitor, tqdm_handler: tqdm):
@@ -242,8 +248,9 @@ class AnonFile:
 
         Note
         ----
-        - `AnonFile` offers unlimited bandwidth
-        - Uploads cannot exceed a file size of 20G
+        Although `anonfile` offers unlimited bandwidth, uploads cannot exceed a
+        file size of 20GB in theory. Due to technical difficulties in the implementation
+        the upper cap occurs much earlier at around 500MB.
         """
         size = os.stat(path).st_size
         options = AnonFile.__progressbar_options(None, f"Upload: {Path(path).name}", unit='B', total=size, disable=progressbar)
@@ -261,7 +268,31 @@ class AnonFile:
                     verify=True
                 )
                 logger.log(logging.INFO if enable_logging else logging.NOTSET, "upload::%s", response.json()['data']['file']['url']['full'])
-                return ParseResponse(response, Path(path))
+                return ParseResponse(response, Path(path), None)
+
+    def preview(self, url: str, path: Path=Path.cwd()) -> ParseResponse:
+        """
+        Obtain meta data associated with this `url` without commiting to a time-
+        consuming download.
+
+        Example
+        -------
+
+        ```
+        from anonfile import AnonFile
+
+        anon = AnonFile()
+        preview = anon.preview('https://anonfiles.com/b7NaVd0cu3/topsecret_mkv')
+
+        # File Size: 116271961B
+        print(f"File Size: {preview.size}B")
+        ```
+        """
+        with self.__get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info")) as response:
+            links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
+            download_link = next(filter(lambda link: 'cdn-' in link, links))
+            file_path = path.joinpath(Path(urlparse(download_link).path).name)
+            return ParseResponse(response, file_path, download_link)
 
     def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
@@ -282,23 +313,22 @@ class AnonFile:
         # WindowsPath('C:/Users/username/Downloads/test.txt')
         print(result.file_path)
         ```
+
+        Note
+        ----
+        The `anon.ddl` property stores a direct download link which is suitable
+        for reading the response stream. In contrast, the URL defined in `anon.url.geturl()`
+        is a better choice for sharing links.
         """
-        get = lambda url, **kwargs: self.session.get(url, timeout=self.timeout, proxies=getproxies(), **kwargs)
-
-        info = get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info"))
-        info.encoding = 'utf-8'
-
-        links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(get(url).text), re.I)
-        download_link = next(filter(lambda link: 'cdn-' in link, links))
-        file_path = path.joinpath(Path(urlparse(download_link).path).name)
-        download = ParseResponse(info, file_path)
+        download = self.preview(url, path)
 
         options = AnonFile.__progressbar_options(None, f"Download {download.id}", unit='B', total=download.size, disable=progressbar)
-        with open(file_path, mode='wb') as file_handler:
+        with open(path.joinpath(download.file_path).name, mode='wb') as file_handler:
             with tqdm(**options) as tqdm_handler:
-                for chunk in get(download_link, stream=True).iter_content(1024):
-                    tqdm_handler.update(len(chunk))
-                    file_handler.write(chunk)
+                with self.__get(download.ddl, stream=True) as response:
+                    for chunk in response.iter_content(1024*1024):
+                        tqdm_handler.update(len(chunk))
+                        file_handler.write(chunk)
 
         logger.log(logging.INFO if enable_logging else logging.NOTSET, "download::%s", url)
         return download
