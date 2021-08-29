@@ -27,6 +27,14 @@ class TestAnonFile(unittest.TestCase):
         self.assertTrue(upload.status, msg="Expected 200 HTTP Error Code")
         self.assertTrue(all([upload.url.scheme, upload.url.netloc, upload.url.path]), msg="Invalid URL.")
 
+    def test_preview(self):
+        preview = self.anon.preview(self.test_small_file)
+        self.assertTrue(preview.status, msg="Error in status property.")
+        self.assertEqual(self.test_small_file, preview.url.geturl(), msg="Error in URL property.")
+        self.assertEqual("93k5x1ucu0", preview.id, msg="Error in ID property.")
+        self.assertEqual("test.txt", preview.file_path.name, msg="Error in name property.")
+        self.assertEqual(271, preview.size, msg="Error in size property.")
+
     def test_download(self):
         download = self.anon.download(self.test_small_file, progressbar=True, enable_logging=True)
         self.assertTrue(download.file_path.exists(), msg="Download not successful.")
