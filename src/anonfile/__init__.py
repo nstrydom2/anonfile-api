@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+from distutils.util import strtobool
 from pathlib import Path
 
 from .anonfile import *
@@ -29,6 +30,7 @@ def main():
     download_parser = subparser.add_parser('download', help="download a file from https://anonfiles.com")
     download_parser.add_argument('-u', '--url', nargs='+', type=str, help="one or more URLs to download", required=True)
     download_parser.add_argument('-p', '--path', type=Path, default=Path.cwd(), help="download directory (CWD by default)")
+    download_parser.add_argument('-c', '--check', default=True, action=argparse.BooleanOptionalAction, help="check for duplicates")
 
     try:
         args = parser.parse_args()
@@ -53,8 +55,16 @@ def main():
 
         if args.command == 'download':
             for url in args.url:
-                download = anon.download(url, args.path, progressbar=args.verbose, enable_logging=args.logging)
-                print(f"File: {download.file_path}")
+                download = lambda url: anon.download(url, args.path, progressbar=args.verbose, enable_logging=args.logging)
+
+                if args.check and anon.preview(url, args.path).file_path.exists():
+                    print(f"\033[33mWarning:\033[0m A file with the same name already exists in {str(args.path)!r}.")
+                    choice = input("Proceed with download? [Y/n] ")
+                    if choice == '' or strtobool(choice):
+                        print(f"File: {download(url).file_path}")
+                else:
+                    print(f"File: {download(url).file_path}")
+
 
     except UserWarning as bad_human:
         print(f"error: {bad_human}")
