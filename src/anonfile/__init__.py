@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -22,6 +23,9 @@ def main():
     upload_parser = subparser.add_parser('upload', help="upload a file to https://anonfiles.com")
     upload_parser.add_argument('-f', '--file', nargs='+', type=Path, help="one or more files to upload.", required=True)
 
+    preview_parser = subparser.add_parser('preview', help="read meta data from a file on https://anonfiles.com")
+    preview_parser.add_argument('-u', '--url', nargs='+', type=str, help="one or more URLs to preview", required=True)
+
     download_parser = subparser.add_parser('download', help="download a file from https://anonfiles.com")
     download_parser.add_argument('-u', '--url', nargs='+', type=str, help="one or more URLs to download", required=True)
     download_parser.add_argument('-p', '--path', type=Path, default=Path.cwd(), help="download directory (CWD by default)")
@@ -37,6 +41,15 @@ def main():
             for file in args.file:
                 upload = anon.upload(file, progressbar=args.verbose, enable_logging=args.logging)
                 print(f"URL: {upload.url.geturl()}")
+
+        if args.command == 'preview':
+            for url in args.url:
+                preview = anon.preview(url)
+                values = ['online' if preview.status else 'offline', preview.file_path.name, preview.url.geturl(), preview.ddl, preview.id, f"{preview.size}B"]
+                print(','.join(values))
+
+                if args.verbose:
+                    print(json.dumps(dict(zip(['Status', 'File Path', 'URL', 'DDL', 'ID', 'Size'], values)), indent=4))
 
         if args.command == 'download':
             for url in args.url:
