@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import json
 import sys
 from distutils.util import strtobool
 from pathlib import Path
@@ -9,6 +8,8 @@ from pathlib import Path
 from .anonfile import *
 from .anonfile import __version__
 
+def __print_dict(dictionary: dict, indent=4) -> None:
+    print("{\n%s\n}" % '\n'.join([f"\033[36m{indent*' '}{key}\033[0m: \033[32m{value}\033[0m" for key, value in dictionary.items()]))
 
 def main():
     parser = argparse.ArgumentParser(prog=package_name)
@@ -48,10 +49,11 @@ def main():
             for url in args.url:
                 preview = anon.preview(url)
                 values = ['online' if preview.status else 'offline', preview.file_path.name, preview.url.geturl(), preview.ddl, preview.id, f"{preview.size}B"]
-                print(','.join(values))
 
                 if args.verbose:
-                    print(json.dumps(dict(zip(['Status', 'File Path', 'URL', 'DDL', 'ID', 'Size'], values)), indent=4))
+                    __print_dict(dict(zip(['Status', 'File Path', 'URL', 'DDL', 'ID', 'Size'], values)))
+                else:
+                    print(','.join(values))
 
         if args.command == 'download':
             for url in args.url:
