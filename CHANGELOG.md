@@ -1,5 +1,26 @@
-
 # Changelog
+
+## Version 0.2.7 (2021-8-31)
+
+Makes further improvements to the CLI:
+
+- implements a `--batch-file` option for the download method
+- adds a `--check` (for duplicates) option to the download method; this can be disabled
+  with the `--no-check` method. It's enabled by default and may require further
+  user-input in case the target directory contains a file with the same name as
+  the issued download command
+- implements a preview command to obtain meta data without committing to a time-
+  consuming download
+
+As for the main library, the following changes have been added since the last release:
+
+- the `ParseResponse` data class now contains a `ddl` field; it contains a direct
+  download link if this structured was returned by a download method, else `None`
+- the default token was renamed from `""` to `"undefined"`. This change has no effect
+  that would require any further actions from you
+- implements the preview command that's also callable from the CLI
+- updates some remarks in the doc string
+- the implementation for issuing requests has been improved here and there
 
 ## Version 0.2.6 (2021-8-21)
 
