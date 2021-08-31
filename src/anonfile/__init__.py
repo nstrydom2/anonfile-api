@@ -12,12 +12,12 @@ from .anonfile import *
 from .anonfile import __version__
 
 
-def __print_dict(dictionary: dict, indent=4) -> None:
+def __print_dict(dictionary: dict, indent: int=4) -> None:
     print("{\n%s\n}" % '\n'.join([f"\033[36m{indent*' '}{key}\033[0m: \033[32m{value}\033[0m" for key, value in dictionary.items()]))
 
 def __from_file(path: Path) -> List[str]:
     with open(path, mode='r', encoding='utf-8') as file_handler:
-        return [line.strip('#').rstrip() for line in file_handler.readlines()]
+        return [line.rstrip() for line in file_handler.readlines() if line[0] != '#']
 
 def main():
     parser = argparse.ArgumentParser(prog=package_name)
