@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import sys
 from distutils.util import strtobool
 from pathlib import Path
+from typing import List
 
 from .anonfile import *
 from .anonfile import __version__
 
+
 def __print_dict(dictionary: dict, indent=4) -> None:
     print("{\n%s\n}" % '\n'.join([f"\033[36m{indent*' '}{key}\033[0m: \033[32m{value}\033[0m" for key, value in dictionary.items()]))
+
+def __from_file(path: Path) -> List[str]:
+    with open(path, mode='r', encoding='utf-8') as file_handler:
+        return [line.strip('#').rstrip() for line in file_handler.readlines()]
 
 def main():
     parser = argparse.ArgumentParser(prog=package_name)
@@ -29,7 +37,8 @@ def main():
     preview_parser.add_argument('-u', '--url', nargs='+', type=str, help="one or more URLs to preview", required=True)
 
     download_parser = subparser.add_parser('download', help="download a file from https://anonfiles.com")
-    download_parser.add_argument('-u', '--url', nargs='+', type=str, help="one or more URLs to download", required=True)
+    download_parser.add_argument('-u', '--url', nargs='*', type=str, help="one or more URLs to download")
+    download_parser.add_argument('-f', '--batch-file', type=Path, nargs='?', help="file containing URLs to download, one URL per line")
     download_parser.add_argument('-p', '--path', type=Path, default=Path.cwd(), help="download directory (CWD by default)")
     download_parser.add_argument('-c', '--check', default=True, action=argparse.BooleanOptionalAction, help="check for duplicates")
 
@@ -56,7 +65,7 @@ def main():
                     print(','.join(values))
 
         if args.command == 'download':
-            for url in args.url:
+            for url in (args.url or __from_file(args.batch_file)):
                 download = lambda url: anon.download(url, args.path, progressbar=args.verbose, enable_logging=args.logging)
 
                 if args.check and anon.preview(url, args.path).file_path.exists():
