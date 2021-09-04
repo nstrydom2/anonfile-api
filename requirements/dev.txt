@@ -2,3 +2,4 @@
 pretty-errors==1.2.19
 check-manifest==0.46
 pytest==6.2.3
+faker==8.12.1

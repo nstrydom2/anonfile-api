@@ -153,22 +153,25 @@ class AnonFile:
     _total = 5
     _status_forcelist = [413, 429, 500, 502, 503, 504]
     _backoff_factor = 1
+    _user_agent = None
 
     API = "https://api.anonfiles.com/"
 
-    __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor']
+    __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor', 'user_agent']
 
     def __init__(self,
                  token: str="undefined",
                  timeout: Tuple[float,float]=_timeout,
                  total: int=_total,
                  status_forcelist: List[int]=_status_forcelist,
-                 backoff_factor: int=_backoff_factor) -> AnonFile:
+                 backoff_factor: int=_backoff_factor,
+                 user_agent: str=_user_agent) -> AnonFile:
         self.token = token
         self.timeout = timeout
         self.total = total,
         self.status_forcelist = status_forcelist,
         self.backoff_factor = backoff_factor
+        self.user_agent = user_agent
 
     @staticmethod
     def __progressbar_options(iterable, desc, unit, color: str="\033[32m", char='\u25CB', total=None, disable=False) -> dict:
@@ -207,7 +210,7 @@ class AnonFile:
         session.mount("https://", HTTPAdapter(max_retries=self.retry_strategy))
         session.hooks['response'] = [lambda response, *args, **kwargs: response.raise_for_status()]
         session.headers.update({
-            'User-Agent' : user_agent(package_name, __version__)
+            'User-Agent' : self.user_agent or user_agent(package_name, __version__)
         })
         return session
 

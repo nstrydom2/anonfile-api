@@ -4,6 +4,8 @@ import hashlib
 import unittest
 from pathlib import Path
 
+from faker import Faker
+
 from src.anonfile import AnonFile
 
 TOKEN = None
@@ -17,7 +19,8 @@ def md5_checksum(path: Path) -> str:
 
 class TestAnonFile(unittest.TestCase):
     def setUp(self):
-        self.anon = AnonFile(TOKEN) if TOKEN else AnonFile()
+        chrome_ua = Faker().chrome(version_from=90, version_to=93, build_from=4400, build_to=4500)
+        self.anon = AnonFile(token=TOKEN, user_agent=chrome_ua) if TOKEN else AnonFile(user_agent=chrome_ua)
         self.test_file = Path("tests/test.txt")
         self.test_small_file = "https://anonfiles.com/93k5x1ucu0/test_txt"
         self.test_med_file = "https://anonfiles.com/b7NaVd0cu3/topsecret_mkv"
