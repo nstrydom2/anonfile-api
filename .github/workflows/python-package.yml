@@ -9,6 +9,7 @@ on:
       - master
       - rec-*
       - dev-*
+      - ci
   pull_request:
     branches:
       - master
