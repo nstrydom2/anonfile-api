@@ -34,7 +34,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from urllib.parse import ParseResult, urljoin, urlparse
 from urllib.request import getproxies
 
@@ -231,7 +231,7 @@ class AnonFile:
         tqdm_handler.total = monitor.len
         tqdm_handler.update(monitor.bytes_read - tqdm_handler.n)
 
-    def upload(self, path: str, progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
+    def upload(self, path: Union[str, Path], progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
         Upload a file located in `path` to http://anonfiles.com. Set
         `enable_logging` to `True` to store the URL in a global config file.
@@ -255,10 +255,11 @@ class AnonFile:
         file size of 20GB in theory. Due to technical difficulties in the implementation
         the upper cap occurs much earlier at around 500MB.
         """
+        path = Path(path)
         size = os.stat(path).st_size
-        options = AnonFile.__progressbar_options(None, f"Upload: {Path(path).name}", unit='B', total=size, disable=progressbar)
+        options = AnonFile.__progressbar_options(None, f"Upload: {path.name}", unit='B', total=size, disable=progressbar)
         with open(path, mode='rb') as file_handler:
-            fields = {'file': (Path(path).name, file_handler, 'application/octet-stream')}
+            fields = {'file': (path.name, file_handler, 'application/octet-stream')}
             with tqdm(**options) as tqdm_handler:
                 encoder_monitor = MultipartEncoderMonitor.from_fields(fields, callback=lambda monitor: AnonFile.__callback(monitor, tqdm_handler))
                 response = self.session.post(
@@ -271,9 +272,9 @@ class AnonFile:
                     verify=True
                 )
                 logger.log(logging.INFO if enable_logging else logging.NOTSET, "upload::%s", response.json()['data']['file']['url']['full'])
-                return ParseResponse(response, Path(path), None)
+                return ParseResponse(response, path, None)
 
-    def preview(self, url: str, path: Path=Path.cwd()) -> ParseResponse:
+    def preview(self, url: str, path: Union[str, Path]=Path.cwd()) -> ParseResponse:
         """
         Obtain meta data associated with this `url` without commiting to a time-
         consuming download.
@@ -294,10 +295,10 @@ class AnonFile:
         with self.__get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info")) as response:
             links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
             ddl = urlparse(next(filter(lambda link: 'cdn-' in link, links)))
-            file_path = path.joinpath(Path(ddl.path).name)
+            file_path = Path(path).joinpath(Path(ddl.path).name)
             return ParseResponse(response, file_path, ddl)
 
-    def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
+    def download(self, url: str, path: Union[str, Path]=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
         Download a file from https://anonfiles.com given a `url`. Set the download
         directory in `path` (uses the current working directory by default). Set
