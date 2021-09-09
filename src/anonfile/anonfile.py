@@ -91,7 +91,7 @@ logger.addHandler(file_handler)
 class ParseResponse:
     response: Response
     file_path: Path
-    ddl: str
+    ddl: ParseResult
 
     @property
     def json(self) -> dict:
@@ -103,7 +103,7 @@ class ParseResponse:
     @property
     def status(self) -> bool:
         """
-        Return the upload status. If `false`, an error message indicating the
+        Return the upload status. If `False`, an error message indicating the
         cause for the malfunction will be redirected to `sys.stderr`.
         """
         status = bool(self.json['status'])
@@ -293,8 +293,8 @@ class AnonFile:
         """
         with self.__get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info")) as response:
             links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
-            ddl = next(filter(lambda link: 'cdn-' in link, links))
-            file_path = path.joinpath(Path(urlparse(ddl).path).name)
+            ddl = urlparse(next(filter(lambda link: 'cdn-' in link, links)))
+            file_path = path.joinpath(Path(ddl.path).name)
             return ParseResponse(response, file_path, ddl)
 
     def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
@@ -328,7 +328,7 @@ class AnonFile:
         options = AnonFile.__progressbar_options(None, f"Download {download.id}", unit='B', total=download.size, disable=progressbar)
         with open(download.file_path, mode='wb') as file_handler:
             with tqdm(**options) as tqdm_handler:
-                with self.__get(download.ddl, stream=True) as response:
+                with self.__get(download.ddl.geturl(), stream=True) as response:
                     for chunk in response.iter_content(1024*1024):
                         tqdm_handler.update(len(chunk))
                         file_handler.write(chunk)
