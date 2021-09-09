@@ -52,7 +52,7 @@ def main():
         if args.command is None:
             raise UserWarning("missing a command")
 
-        if len(args.user_agent) > 0:
+        if args.user_agent is not None:
             anon.user_agent = args.user_agent
 
         if args.command == 'upload':
