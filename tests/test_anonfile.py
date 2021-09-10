@@ -65,11 +65,11 @@ class TestAnonFileLibrary(unittest.TestCase):
         self.assertEqual(download.file_path.name, self.test_file.name, msg="Different file in download path detected.")
         self.garbage.append(download.file_path)
 
-    # def test_multipart_encoded_files(self):
-    #     # use pre-computed checksum for faster unit tests
-    #     download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
-    #     self.assertEqual("06b6a6bea6ba82900d144d3b38c65347", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
-    #     self.garbage.append(download.file_path)
+    def test_multipart_encoded_files(self):
+        # use pre-computed checksum for faster unit tests
+        download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
+        self.assertEqual("06b6a6bea6ba82900d144d3b38c65347", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
+        self.garbage.append(download.file_path)
 
     @classmethod
     def tearDownClass(cls):
