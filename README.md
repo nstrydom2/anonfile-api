@@ -84,8 +84,8 @@ the `AnonFile` API visit [anonfiles.com](https://anonfiles.com/docs/api).
 ## Command Line Interface
 
 ```bash
-# get help
-anonfile [download|upload] --help
+# open help page for specific commands
+anonfile [download|upload|preview|log] --help
 
 # note: both methods expect at least one argument, but can take on more
 anonfile download --url https://anonfiles.com/93k5x1ucu0/test_txt
