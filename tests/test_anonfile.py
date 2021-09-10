@@ -92,17 +92,17 @@ class TestAnonFileCLI(unittest.TestCase):
 
     def test_cli_download(self):
         url = self.test_preview.url.geturl()
-        subprocess.call("anonfile --verbose download --url %s --no-check" % url, shell=True)
-        self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {url!r}")
+        call = subprocess.call("anonfile --verbose download --url %s --no-check" % url, shell=True)
+        self.assertEqual(call, 0, msg=f"Download failed for: {url!r}")
 
     def test_cli_batch_download(self):
-        subprocess.call("anonfile --verbose --logging download --batch-file %s --no-check" % self.batch_file, shell=True)
-        self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {str(self.batch_file)!r}")
+        call = subprocess.call("anonfile --verbose --logging download --batch-file %s --no-check" % self.batch_file, shell=True)
+        self.assertEqual(call, 0, msg=f"Download failed for: {str(self.batch_file)!r}")
 
     def test_cli_log(self):
         print()
-        subprocess.call("anonfile log --read", shell=True)
-        self.assertTrue(self.logfile.exists(), msg=f"Error: no log file produced in {str(self.logfile)!r}")
+        call = subprocess.call("anonfile log --read", shell=True)
+        self.assertTrue(self.logfile.exists() and (call == 0), msg=f"Error: no log file produced in {str(self.logfile)!r}")
 
     @classmethod
     def tearDownClass(cls):
