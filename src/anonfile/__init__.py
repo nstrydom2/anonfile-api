@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from collections import namedtuple
 from distutils.util import strtobool
 from pathlib import Path
 from typing import List
@@ -48,6 +49,11 @@ def main():
     download_parser.add_argument('-c', '--check', default=True, action='store_true', help="check for duplicates (default)")
     download_parser.add_argument('--no-check', dest='check', action='store_false', help="disable checking for duplicates")
 
+    log_parser = subparser.add_parser('log', help="access the anonfile logger")
+    log_parser.add_argument('--reset', action='store_true', help="reset all log file entries")
+    log_parser.add_argument('--path', action='store_true', help="return the log file path")
+    log_parser.add_argument('--read', action='store_true', help='read the log file')
+
     try:
         args = parser.parse_args()
         anon = AnonFile(args.token)
@@ -84,6 +90,31 @@ def main():
                         print(f"File: {download(url).file_path}")
                 else:
                     print(f"File: {download(url).file_path}")
+
+        if args.command == 'log':
+            if args.reset:
+                open(get_logfile_path(), mode='w', encoding='utf-8').close()
+            if args.path:
+                print(get_logfile_path())
+            if args.read:
+                with open(get_logfile_path(), mode='r', encoding='utf-8') as file_handler:
+                    log = file_handler.readlines()
+
+                    if not log:
+                        msg = "Nothing to read because the log file is empty"
+                        print(f"\033[33m{'[ WARNING ]'.ljust(12, ' ')}\033[0m{msg}")
+                        return
+
+                    parse = lambda line: line.strip('\n').split('::')
+                    Entry = namedtuple('Entry', 'timestamp method url')
+
+                    tabulate = "{:<19} {:<8} {:<30}".format
+
+                    print(f"\033[32m{tabulate('Date', 'Method', 'URL')}\033[0m")
+
+                    for line in log:
+                        entry = Entry(parse(line)[0], parse(line)[1], parse(line)[2])
+                        print(tabulate(entry.timestamp, entry.method, entry.url))
 
     except UserWarning as bad_human:
         print(f"error: {bad_human}")
