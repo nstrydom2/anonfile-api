@@ -81,12 +81,9 @@ class TestAnonFileCLI(unittest.TestCase):
     def setUp(cls):
         cls.anon = init_anon()
         cls.test_urls = [
-            "https://anonfiles.com/93k5x1ucu0/test_txt",
             "https://anonfiles.com/n5j2O8G9u0/test_txt",
-            "https://anonfiles.com/93k5x1ucu0/test_txt",
             "https://anonfiles.com/pdj2O8Gbud/test_txt",
-            "https://anonfiles.com/raj5OeGcu3/test_txt",
-            "https://anonfiles.com/t1jeOfG1u2/test_txt"
+            "https://anonfiles.com/n5j2O8G9u0/test_txt"
         ]
         cls.test_preview = cls.anon.preview("https://anonfiles.com/93k5x1ucu0/test_txt")
         cls.batch_file = write_file('batch.txt', cls.test_urls)
@@ -99,12 +96,12 @@ class TestAnonFileCLI(unittest.TestCase):
 
     def test_cli_batch_download(self):
         os.system("anonfile --verbose download --batch-file %s --no-check" % self.batch_file)
-        self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {self.batch_file!r}")
+        self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {str(self.batch_file)!r}")
 
     def test_cli_log(self):
         print()
         os.system("anonfile log --read")
-        self.assertTrue(self.logfile.exists(), msg=f"Error: no log file produced in {self.logfile!r}")
+        self.assertTrue(self.logfile.exists(), msg=f"Error: no log file produced in {str(self.logfile)!r}")
 
     @classmethod
     def tearDownClass(cls):
