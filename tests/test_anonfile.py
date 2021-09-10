@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 import hashlib
+import os
 import unittest
 from pathlib import Path
 
 from faker import Faker
 
-from src.anonfile import AnonFile
+from src.anonfile import AnonFile, get_logfile_path
 
 TOKEN = None
 
@@ -20,13 +21,29 @@ def md5_checksum(path: Path) -> str:
         return hashlib.md5(file_handler.read()).hexdigest()
 
 
-class TestAnonFile(unittest.TestCase):
-    def setUp(self):
-        chrome_ua = Faker().chrome(version_from=90, version_to=93, build_from=4400, build_to=4500)
-        self.anon = AnonFile(token=TOKEN, user_agent=chrome_ua) if TOKEN else AnonFile(user_agent=chrome_ua)
-        self.test_file = Path("tests/test.txt")
-        self.test_small_file = "https://anonfiles.com/93k5x1ucu0/test_txt"
-        self.test_med_file = "https://anonfiles.com/b7NaVd0cu3/topsecret_mkv"
+def init_anon() -> AnonFile:
+    chrome_ua = Faker().chrome(version_from=90, version_to=93, build_from=4400, build_to=4500)
+    return AnonFile(token=TOKEN, user_agent=chrome_ua) if TOKEN else AnonFile(user_agent=chrome_ua)
+
+
+def write_file(file: str, lines: list) -> Path:
+    with open(file, mode='w+') as file_handler:
+        file_handler.write('\n'.join(lines))
+        return Path(file)
+
+
+def remove_file(file: str) -> None:
+    Path(file).unlink() if Path(file).exists() else None
+
+
+class TestAnonFileLibrary(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.anon = init_anon()
+        cls.test_file = Path("tests/test.txt")
+        cls.test_small_file = "https://anonfiles.com/93k5x1ucu0/test_txt"
+        cls.test_med_file = "https://anonfiles.com/b7NaVd0cu3/topsecret_mkv"
+        cls.garbage = []
 
     def test_upload(self):
         upload = self.anon.upload(self.test_file, progressbar=True, enable_logging=True)
@@ -45,10 +62,52 @@ class TestAnonFile(unittest.TestCase):
         download = self.anon.download(self.test_small_file, progressbar=True, enable_logging=True)
         self.assertTrue(download.file_path.exists(), msg="Download not successful.")
         self.assertEqual(download.file_path.name, self.test_file.name, msg="Different file in download path detected.")
-        download.file_path.unlink()
+        self.garbage.append(download.file_path)
 
     def test_multipart_encoded_files(self):
         # use pre-computed checksum for faster unit tests
         download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
         self.assertEqual("06b6a6bea6ba82900d144d3b38c65347", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
-        download.file_path.unlink()
+        self.garbage.append(download.file_path)
+
+    @classmethod
+    def tearDownClass(cls):
+        for file in cls.garbage:
+            remove_file(file)
+
+
+class TestAnonFileCLI(unittest.TestCase):
+    @classmethod
+    def setUp(cls):
+        cls.anon = init_anon()
+        cls.test_urls = [
+            "https://anonfiles.com/93k5x1ucu0/test_txt",
+            "https://anonfiles.com/n5j2O8G9u0/test_txt",
+            "https://anonfiles.com/93k5x1ucu0/test_txt",
+            "https://anonfiles.com/pdj2O8Gbud/test_txt",
+            "https://anonfiles.com/raj5OeGcu3/test_txt",
+            "https://anonfiles.com/t1jeOfG1u2/test_txt"
+        ]
+        cls.test_preview = cls.anon.preview("https://anonfiles.com/93k5x1ucu0/test_txt")
+        cls.batch_file = write_file('batch.txt', cls.test_urls)
+        cls.logfile = get_logfile_path()
+
+    def test_cli_download(self):
+        url = self.test_preview.url.geturl()
+        os.system("anonfile --logging download --url %s --no-check" % url)
+        self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {url!r}")
+
+    def test_cli_batch_download(self):
+        os.system("anonfile --verbose download --batch-file %s --no-check" % self.batch_file)
+        self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {self.batch_file!r}")
+
+    def test_cli_log(self):
+        print()
+        os.system("anonfile log --read")
+        self.assertTrue(self.logfile.exists(), msg=f"Error: no log file produced in {self.logfile!r}")
+
+    @classmethod
+    def tearDownClass(cls):
+        remove_file(cls.test_preview.file_path)
+        remove_file(cls.batch_file)
+        remove_file(cls.logfile)
