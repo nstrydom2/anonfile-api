@@ -2,6 +2,7 @@
 
 import hashlib
 import os
+import random
 import unittest
 from pathlib import Path
 
@@ -85,7 +86,7 @@ class TestAnonFileCLI(unittest.TestCase):
             "https://anonfiles.com/pdj2O8Gbud/test_txt",
             "https://anonfiles.com/n5j2O8G9u0/test_txt"
         ]
-        cls.test_preview = cls.anon.preview("https://anonfiles.com/93k5x1ucu0/test_txt")
+        cls.test_preview = cls.anon.preview(random.choice(cls.test_urls))
         cls.batch_file = write_file('batch.txt', cls.test_urls)
         cls.logfile = get_logfile_path()
 
