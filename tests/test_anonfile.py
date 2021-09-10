@@ -79,7 +79,7 @@ class TestAnonFileLibrary(unittest.TestCase):
 
 class TestAnonFileCLI(unittest.TestCase):
     @classmethod
-    def setUp(cls):
+    def setUpClass(cls):
         cls.anon = init_anon()
         cls.test_urls = [
             "https://anonfiles.com/n5j2O8G9u0/test_txt",
