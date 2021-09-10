@@ -86,18 +86,17 @@ class TestAnonFileCLI(unittest.TestCase):
             "https://anonfiles.com/pdj2O8Gbud/test_txt",
             "https://anonfiles.com/n5j2O8G9u0/test_txt"
         ]
-        cls.test_preview = cls.anon.preview(random.choice(cls.test_urls))
+        cls.test_url = random.choice(cls.test_urls)
         cls.batch_file = write_file('batch.txt', cls.test_urls)
         cls.logfile = get_logfile_path()
 
     def test_cli_download(self):
-        url = self.test_preview.url.geturl()
-        call = subprocess.call("anonfile --verbose download --url %s --no-check" % url, shell=True)
-        self.assertEqual(call, 0, msg=f"Download failed for: {url!r}")
+        call = subprocess.call("anonfile --verbose download --url %s --no-check" % self.test_url, shell=True)
+        self.assertFalse(call, msg=f"Download failed for: {self.test_url!r}")
 
     def test_cli_batch_download(self):
         call = subprocess.call("anonfile --verbose --logging download --batch-file %s --no-check" % self.batch_file, shell=True)
-        self.assertEqual(call, 0, msg=f"Download failed for: {str(self.batch_file)!r}")
+        self.assertFalse(call, msg=f"Download failed for: {str(self.batch_file)!r}")
 
     def test_cli_log(self):
         print()
@@ -106,6 +105,5 @@ class TestAnonFileCLI(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        remove_file(cls.test_preview.file_path)
         remove_file(cls.batch_file)
         remove_file(cls.logfile)
