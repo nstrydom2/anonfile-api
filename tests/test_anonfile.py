@@ -10,12 +10,15 @@ from src.anonfile import AnonFile
 
 TOKEN = None
 
+
 def test_option(token):
     TOKEN = token
+
 
 def md5_checksum(path: Path) -> str:
     with open(path, mode='rb') as file_handler:
         return hashlib.md5(file_handler.read()).hexdigest()
+
 
 class TestAnonFile(unittest.TestCase):
     def setUp(self):

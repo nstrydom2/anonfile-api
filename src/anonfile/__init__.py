@@ -12,12 +12,14 @@ from .anonfile import *
 from .anonfile import __version__
 
 
-def __print_dict(dictionary: dict, indent: int=4) -> None:
-    print("{\n%s\n}" % '\n'.join([f"\033[36m{indent*' '}{key}\033[0m: \033[32m{value}\033[0m" for key, value in dictionary.items()]))
+def __print_dict(dictionary: dict, indent: int = 4) -> None:
+    print("{\n%s\n}" % '\n'.join([f"\033[36m{indent * ' '}{key}\033[0m: \033[32m{value}\033[0m" for key, value in dictionary.items()]))
+
 
 def __from_file(path: Path) -> List[str]:
     with open(path, mode='r', encoding='utf-8') as file_handler:
         return [line.rstrip() for line in file_handler.readlines() if line[0] != '#']
+
 
 def main():
     parser = argparse.ArgumentParser(prog=package_name)
@@ -25,9 +27,10 @@ def main():
     parser._optionals.title = 'Arguments'
 
     parser.add_argument('-v', '--version', action='version', version=f"%(prog)s {__version__}")
-    parser.add_argument('-V', '--verbose', default=True, action=argparse.BooleanOptionalAction, help="increase output verbosity")
-    parser.add_argument('-l', '--logging', default=True, action=argparse.BooleanOptionalAction, help="enable URL logging")
+    parser.add_argument('-V', '--verbose', default=False, action='store_true', help="increase output verbosity")
+    parser.add_argument('-l', '--logging', default=False, action='store_true', help="enable URL logging")
     parser.add_argument('-t', '--token', type=str, default='secret', help="configure an API token (optional)")
+    parser.add_argument('-a', '--user-agent', type=str, help="configure custom User-Agent")
 
     subparser = parser.add_subparsers(dest='command')
     upload_parser = subparser.add_parser('upload', help="upload a file to https://anonfiles.com")
@@ -40,7 +43,7 @@ def main():
     download_parser.add_argument('-u', '--url', nargs='*', type=str, help="one or more URLs to download")
     download_parser.add_argument('-f', '--batch-file', type=Path, nargs='?', help="file containing URLs to download, one URL per line")
     download_parser.add_argument('-p', '--path', type=Path, default=Path.cwd(), help="download directory (CWD by default)")
-    download_parser.add_argument('-c', '--check', default=True, action=argparse.BooleanOptionalAction, help="check for duplicates")
+    download_parser.add_argument('-c', '--check', default=False, action='store_true', help="check for duplicates")
 
     try:
         args = parser.parse_args()
@@ -48,6 +51,9 @@ def main():
 
         if args.command is None:
             raise UserWarning("missing a command")
+
+        if args.user_agent is not None:
+            anon.user_agent = args.user_agent
 
         if args.command == 'upload':
             for file in args.file:
@@ -75,7 +81,6 @@ def main():
                         print(f"File: {download(url).file_path}")
                 else:
                     print(f"File: {download(url).file_path}")
-
 
     except UserWarning as bad_human:
         print(f"error: {bad_human}")
