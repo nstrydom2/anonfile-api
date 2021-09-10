@@ -89,6 +89,10 @@ logger.addHandler(file_handler)
 
 @dataclass(frozen=True)
 class ParseResponse:
+    """
+    Data class that is primarily used as a structured return type for the upload,
+    preview and download methods.
+    """
     response: Response
     file_path: Path
     ddl: ParseResult
@@ -146,9 +150,35 @@ class ParseResponse:
         """
         return int(self.json['data']['file']['metadata']['size']['bytes'])
 
+    def __str__(self) -> str:
+        return str(self.name)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(ID={self.id})"
+
     #endregion
 
 class AnonFile:
+    """
+    The unofficial Python API for https://anonfiles.com.
+
+    Basic Usage
+    -----------
+
+    ```
+    from anonfile import AnonFile
+
+    anon = AnonFile()
+    preview = anon.preview('https://anonfiles.com/b7NaVd0cu3/topsecret_mkv')
+
+    # topsecret.mkv
+    print(preview)
+    ```
+
+    Docs
+    ----
+    See full documentation at <https://www.hentai-chan.dev/projects/anonfile>.
+    """
     _timeout = (5, 5)
     _total = 5
     _status_forcelist = [413, 429, 500, 502, 503, 504]
@@ -252,7 +282,7 @@ class AnonFile:
         Note
         ----
         Although `anonfile` offers unlimited bandwidth, uploads cannot exceed a
-        file size of 20GB in theory. Due to technical difficulties in the implementation
+        file size of 20GB in theory. Due to technical difficulties in the implementation,
         the upper cap occurs much earlier at around 500MB.
         """
         path = Path(path)
