@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import hashlib
-import os
 import random
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -65,11 +65,11 @@ class TestAnonFileLibrary(unittest.TestCase):
         self.assertEqual(download.file_path.name, self.test_file.name, msg="Different file in download path detected.")
         self.garbage.append(download.file_path)
 
-    def test_multipart_encoded_files(self):
-        # use pre-computed checksum for faster unit tests
-        download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
-        self.assertEqual("06b6a6bea6ba82900d144d3b38c65347", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
-        self.garbage.append(download.file_path)
+    # def test_multipart_encoded_files(self):
+    #     # use pre-computed checksum for faster unit tests
+    #     download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
+    #     self.assertEqual("06b6a6bea6ba82900d144d3b38c65347", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
+    #     self.garbage.append(download.file_path)
 
     @classmethod
     def tearDownClass(cls):
@@ -92,16 +92,16 @@ class TestAnonFileCLI(unittest.TestCase):
 
     def test_cli_download(self):
         url = self.test_preview.url.geturl()
-        os.system("anonfile --logging download --url %s --no-check" % url)
+        subprocess.call("anonfile --verbose download --url %s --no-check" % url, shell=True)
         self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {url!r}")
 
     def test_cli_batch_download(self):
-        os.system("anonfile --verbose download --batch-file %s --no-check" % self.batch_file)
+        subprocess.call("anonfile --verbose --logging download --batch-file %s --no-check" % self.batch_file, shell=True)
         self.assertTrue(self.test_preview.file_path.exists(), f"Download failed for: {str(self.batch_file)!r}")
 
     def test_cli_log(self):
         print()
-        os.system("anonfile log --read")
+        subprocess.call("anonfile log --read", shell=True)
         self.assertTrue(self.logfile.exists(), msg=f"Error: no log file produced in {str(self.logfile)!r}")
 
     @classmethod
