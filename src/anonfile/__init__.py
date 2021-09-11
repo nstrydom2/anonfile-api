@@ -22,6 +22,10 @@ def __from_file(path: Path) -> List[str]:
         return [line.rstrip() for line in file_handler.readlines() if line[0] != '#']
 
 
+def format_proxies(proxies: str) -> dict:
+    return {prot: f"{prot}://{ip}" for (prot, ip) in [proxy.split('://') for proxy in proxies.split()]}
+
+
 def main():
     parser = argparse.ArgumentParser(prog=package_name)
     parser._positionals.title = 'Commands'
@@ -34,6 +38,7 @@ def main():
     parser.add_argument('--no-logging', dest='logging', action='store_false', help="disable all logging activities")
     parser.add_argument('-t', '--token', type=str, default='secret', help="configure an API token (optional)")
     parser.add_argument('-a', '--user-agent', type=str, default=None, help="configure custom User-Agent (optional)")
+    parser.add_argument('-p', '--proxies', type=str, default=None, help="configure HTTP and/or HTTPS proxies (optional)")
 
     subparser = parser.add_subparsers(dest='command')
     upload_parser = subparser.add_parser('upload', help="upload a file to https://anonfiles.com")
@@ -56,7 +61,7 @@ def main():
 
     try:
         args = parser.parse_args()
-        anon = AnonFile(args.token, user_agent=args.user_agent)
+        anon = AnonFile(args.token, user_agent=args.user_agent, proxies=format_proxies(args.proxies) if args.proxies else None)
 
         if args.command is None:
             raise UserWarning("missing a command")
