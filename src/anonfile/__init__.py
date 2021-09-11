@@ -33,7 +33,7 @@ def main():
     parser.add_argument('-l', '--logging', default=True, action='store_true', help="enable URL logging (default)")
     parser.add_argument('--no-logging', dest='logging', action='store_false', help="disable all logging activities")
     parser.add_argument('-t', '--token', type=str, default='secret', help="configure an API token (optional)")
-    parser.add_argument('-a', '--user-agent', type=str, help="configure custom User-Agent (optional)")
+    parser.add_argument('-a', '--user-agent', type=str, default=None, help="configure custom User-Agent (optional)")
 
     subparser = parser.add_subparsers(dest='command')
     upload_parser = subparser.add_parser('upload', help="upload a file to https://anonfiles.com")
@@ -56,7 +56,7 @@ def main():
 
     try:
         args = parser.parse_args()
-        anon = AnonFile(args.token)
+        anon = AnonFile(args.token, user_agent=args.user_agent)
 
         if args.command is None:
             raise UserWarning("missing a command")
