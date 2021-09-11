@@ -184,10 +184,11 @@ class AnonFile:
     _status_forcelist = [413, 429, 500, 502, 503, 504]
     _backoff_factor = 1
     _user_agent = None
+    _proxies = None
 
     API = "https://api.anonfiles.com/"
 
-    __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor', 'user_agent']
+    __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor', 'user_agent', 'proxies']
 
     def __init__(self,
                  token: str="undefined",
@@ -195,13 +196,15 @@ class AnonFile:
                  total: int=_total,
                  status_forcelist: List[int]=_status_forcelist,
                  backoff_factor: int=_backoff_factor,
-                 user_agent: str=_user_agent) -> AnonFile:
+                 user_agent: str=_user_agent,
+                 proxies: dict=_proxies) -> AnonFile:
         self.token = token
         self.timeout = timeout
         self.total = total,
         self.status_forcelist = status_forcelist,
         self.backoff_factor = backoff_factor
         self.user_agent = user_agent
+        self.proxies = proxies
 
     @staticmethod
     def __progressbar_options(iterable, desc, unit, color: str="\033[32m", char='\u25CB', total=None, disable=False) -> dict:
@@ -249,7 +252,7 @@ class AnonFile:
         Returns the GET request encoded in `utf-8`. Adds proxies to this session
         on the fly if urllib is able to pick up the system's proxy settings.
         """
-        response = self.session.get(url, timeout=self.timeout, proxies=getproxies(), **kwargs)
+        response = self.session.get(url, timeout=self.timeout, proxies=self.proxies or getproxies(), **kwargs)
         response.encoding = 'utf-8'
         return response
 
