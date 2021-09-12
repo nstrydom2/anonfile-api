@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.2.7 (2021-8-31)
+## Version 0.2.7 (2021-9-12)
 
 Makes further improvements to the CLI:
 
@@ -9,8 +9,11 @@ Makes further improvements to the CLI:
   with the `--no-check` method. It's enabled by default and may require further
   user-input in case the target directory contains a file with the same name as
   the issued download command
+- further adds a `--user-agent` and `--proxies` flag to the CLI; these fields were also
+  added to the `AnonFile` constructor
 - implements a preview command to obtain meta data without committing to a time-
   consuming download
+- commands related to the log file were also added to the CLI
 
 As for the main library, the following changes have been added since the last release:
 
