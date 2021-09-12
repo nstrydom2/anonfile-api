@@ -34,7 +34,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from urllib.parse import ParseResult, urljoin, urlparse
 from urllib.request import getproxies
 
@@ -89,9 +89,13 @@ logger.addHandler(file_handler)
 
 @dataclass(frozen=True)
 class ParseResponse:
+    """
+    Data class that is primarily used as a structured return type for the upload,
+    preview and download methods.
+    """
     response: Response
     file_path: Path
-    ddl: str
+    ddl: ParseResult
 
     @property
     def json(self) -> dict:
@@ -103,7 +107,7 @@ class ParseResponse:
     @property
     def status(self) -> bool:
         """
-        Return the upload status. If `false`, an error message indicating the
+        Return the upload status. If `False`, an error message indicating the
         cause for the malfunction will be redirected to `sys.stderr`.
         """
         status = bool(self.json['status'])
@@ -146,18 +150,45 @@ class ParseResponse:
         """
         return int(self.json['data']['file']['metadata']['size']['bytes'])
 
+    def __str__(self) -> str:
+        return str(self.name)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(ID={self.id})"
+
     #endregion
 
 class AnonFile:
+    """
+    The unofficial Python API for https://anonfiles.com.
+
+    Basic Usage
+    -----------
+
+    ```
+    from anonfile import AnonFile
+
+    anon = AnonFile()
+    preview = anon.preview('https://anonfiles.com/b7NaVd0cu3/topsecret_mkv')
+
+    # topsecret.mkv
+    print(preview)
+    ```
+
+    Docs
+    ----
+    See full documentation at <https://www.hentai-chan.dev/projects/anonfile>.
+    """
     _timeout = (5, 5)
     _total = 5
     _status_forcelist = [413, 429, 500, 502, 503, 504]
     _backoff_factor = 1
     _user_agent = None
+    _proxies = None
 
     API = "https://api.anonfiles.com/"
 
-    __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor', 'user_agent']
+    __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor', 'user_agent', 'proxies']
 
     def __init__(self,
                  token: str="undefined",
@@ -165,13 +196,15 @@ class AnonFile:
                  total: int=_total,
                  status_forcelist: List[int]=_status_forcelist,
                  backoff_factor: int=_backoff_factor,
-                 user_agent: str=_user_agent) -> AnonFile:
+                 user_agent: str=_user_agent,
+                 proxies: dict=_proxies) -> AnonFile:
         self.token = token
         self.timeout = timeout
         self.total = total,
         self.status_forcelist = status_forcelist,
         self.backoff_factor = backoff_factor
         self.user_agent = user_agent
+        self.proxies = proxies
 
     @staticmethod
     def __progressbar_options(iterable, desc, unit, color: str="\033[32m", char='\u25CB', total=None, disable=False) -> dict:
@@ -219,7 +252,7 @@ class AnonFile:
         Returns the GET request encoded in `utf-8`. Adds proxies to this session
         on the fly if urllib is able to pick up the system's proxy settings.
         """
-        response = self.session.get(url, timeout=self.timeout, proxies=getproxies(), **kwargs)
+        response = self.session.get(url, timeout=self.timeout, proxies=self.proxies or getproxies(), **kwargs)
         response.encoding = 'utf-8'
         return response
 
@@ -231,7 +264,7 @@ class AnonFile:
         tqdm_handler.total = monitor.len
         tqdm_handler.update(monitor.bytes_read - tqdm_handler.n)
 
-    def upload(self, path: str, progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
+    def upload(self, path: Union[str, Path], progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
         Upload a file located in `path` to http://anonfiles.com. Set
         `enable_logging` to `True` to store the URL in a global config file.
@@ -252,13 +285,14 @@ class AnonFile:
         Note
         ----
         Although `anonfile` offers unlimited bandwidth, uploads cannot exceed a
-        file size of 20GB in theory. Due to technical difficulties in the implementation
+        file size of 20GB in theory. Due to technical difficulties in the implementation,
         the upper cap occurs much earlier at around 500MB.
         """
+        path = Path(path)
         size = os.stat(path).st_size
-        options = AnonFile.__progressbar_options(None, f"Upload: {Path(path).name}", unit='B', total=size, disable=progressbar)
+        options = AnonFile.__progressbar_options(None, f"Upload: {path.name}", unit='B', total=size, disable=progressbar)
         with open(path, mode='rb') as file_handler:
-            fields = {'file': (Path(path).name, file_handler, 'application/octet-stream')}
+            fields = {'file': (path.name, file_handler, 'application/octet-stream')}
             with tqdm(**options) as tqdm_handler:
                 encoder_monitor = MultipartEncoderMonitor.from_fields(fields, callback=lambda monitor: AnonFile.__callback(monitor, tqdm_handler))
                 response = self.session.post(
@@ -271,9 +305,9 @@ class AnonFile:
                     verify=True
                 )
                 logger.log(logging.INFO if enable_logging else logging.NOTSET, "upload::%s", response.json()['data']['file']['url']['full'])
-                return ParseResponse(response, Path(path), None)
+                return ParseResponse(response, path, None)
 
-    def preview(self, url: str, path: Path=Path.cwd()) -> ParseResponse:
+    def preview(self, url: str, path: Union[str, Path]=Path.cwd()) -> ParseResponse:
         """
         Obtain meta data associated with this `url` without commiting to a time-
         consuming download.
@@ -293,11 +327,11 @@ class AnonFile:
         """
         with self.__get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info")) as response:
             links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
-            ddl = next(filter(lambda link: 'cdn-' in link, links))
-            file_path = path.joinpath(Path(urlparse(ddl).path).name)
+            ddl = urlparse(next(filter(lambda link: 'cdn-' in link, links)))
+            file_path = Path(path).joinpath(Path(ddl.path).name)
             return ParseResponse(response, file_path, ddl)
 
-    def download(self, url: str, path: Path=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
+    def download(self, url: str, path: Union[str, Path]=Path.cwd(), progressbar: bool=False, enable_logging: bool=False) -> ParseResponse:
         """
         Download a file from https://anonfiles.com given a `url`. Set the download
         directory in `path` (uses the current working directory by default). Set
@@ -328,7 +362,7 @@ class AnonFile:
         options = AnonFile.__progressbar_options(None, f"Download {download.id}", unit='B', total=download.size, disable=progressbar)
         with open(download.file_path, mode='wb') as file_handler:
             with tqdm(**options) as tqdm_handler:
-                with self.__get(download.ddl, stream=True) as response:
+                with self.__get(download.ddl.geturl(), stream=True) as response:
                     for chunk in response.iter_content(1024*1024):
                         tqdm_handler.update(len(chunk))
                         file_handler.write(chunk)
