@@ -8,6 +8,7 @@ def pytest_addoption(parser):
         help="Secret anonfiles.com API token."
     )
 
+
 def pytest_generate_tests(metafunc):
     if 'token' in metafunc.fixturenames:
         metafunc.parametrize('token', metafunc.config.getoption('token'))
