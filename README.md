@@ -10,7 +10,6 @@
 [![CI](https://github.com/nstrydom2/anonfile-api/actions/workflows/python-package.yml/badge.svg?branch=master)](https://github.com/nstrydom2/anonfile-api/actions/workflows/python-package.yml)
 [![PyPI download total](https://img.shields.io/pypi/dm/anonfile)](https://pypi.python.org/pypi/anonfile/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/anonfile)](https://pypi.python.org/pypi/anonfile/)
-[![CodeFactor](https://www.codefactor.io/repository/github/nstrydom2/anonfile-api/badge)](https://www.codefactor.io/repository/github/nstrydom2/anonfile-api)
 [![PyPI license](https://img.shields.io/pypi/l/anonfile)](https://pypi.python.org/pypi/anonfile/)
 
 
