@@ -5,6 +5,7 @@ import random
 import subprocess
 import unittest
 from pathlib import Path
+from unittest import skip
 
 from faker import Faker
 
@@ -43,7 +44,7 @@ class TestAnonFileLibrary(unittest.TestCase):
         cls.anon = init_anon()
         cls.test_file = Path("tests/test.txt")
         cls.test_small_file = "https://anonfiles.com/93k5x1ucu0/test_txt"
-        cls.test_med_file = "https://anonfiles.com/b7NaVd0cu3/topsecret_mkv"
+        cls.test_med_file = "https://anonfiles.com/Z6j7c9V6x5/topsecret_mp4"
         cls.garbage = []
 
     def test_upload(self):
@@ -68,7 +69,7 @@ class TestAnonFileLibrary(unittest.TestCase):
     def test_multipart_encoded_files(self):
         # use pre-computed checksum for faster unit tests
         download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
-        self.assertEqual("06b6a6bea6ba82900d144d3b38c65347", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
+        self.assertEqual("4578bdb7cc943f2280d567479794bc81", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
         self.garbage.append(download.file_path)
 
     @classmethod
