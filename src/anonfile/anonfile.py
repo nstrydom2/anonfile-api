@@ -146,9 +146,18 @@ class ParseResponse:
     @property
     def size(self) -> int:
         """
-        Return the uploaded file size in bytes.
+        Return the uploaded file size in bytes as an integer.
         """
         return int(self.json['data']['file']['metadata']['size']['bytes'])
+    
+    # It was the only dedicated response missing from the original json query
+    # So I just added it. - MobCat
+    @property
+    def sizeStr(self) -> str:
+        """
+        Return the uploaded file size in a formatted string. eg. "3.37 MB"
+        """
+        return self.json['data']['file']['metadata']['size']['readable']
 
     def __str__(self) -> str:
         return str(self.name)
