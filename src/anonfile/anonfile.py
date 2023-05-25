@@ -319,7 +319,7 @@ class AnonFile:
         from anonfile import AnonFile
 
         anon = AnonFile()
-        preview = anon.preview('https://anonfiles.com/b7NaVd0cu3/topsecret_mkv')
+        preview = anon.preview('https://anonfiles.com/P0mev3tfz7/topsecret_mp4')
 
         # File Size: 116271961B
         print(f"File Size: {preview.size}B")
