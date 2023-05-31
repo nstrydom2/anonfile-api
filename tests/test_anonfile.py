@@ -2,22 +2,20 @@
 
 import hashlib
 import json
-import random
-import subprocess
 import unittest
 from pathlib import Path
-from unittest import skip
 from unittest.mock import patch, Mock, MagicMock
 
 from faker import Faker
 from requests import Response
 
-from src.anonfile import AnonFile, get_logfile_path
+from src.anonfile import AnonFile
 
 TOKEN = None
 
 
 def test_option(token):
+    global TOKEN
     TOKEN = token
 
 
@@ -38,10 +36,44 @@ def write_file(file: str, lines: list) -> Path:
 
 
 def remove_file(file: str) -> None:
-    Path(file).unlink() if Path(file).exists() else None
+    Path(file).unlink(missing_ok=True)
 
 
-class TestAnonFileLibrary(unittest.TestCase):
+class MockData:
+    @staticmethod
+    def get_json_response(filename):
+        with open(filename, "r", encoding="utf-8") as json_file:
+            json_response = Mock(spec=Response)
+            json_response.__enter__ = MagicMock(return_value=json_response)
+            json_response.__exit__ = MagicMock()
+            json_response.status_code = 200
+            json_response.json.return_value = json.loads(json_file.read())
+            return json_response
+
+    @staticmethod
+    def get_html_response(filename):
+        with open(filename, "r", encoding="utf-8") as html_file:
+            html_response = Mock(spec=Response)
+            html_response.__enter__ = MagicMock(return_value=html_response)
+            html_response.__exit__ = MagicMock()
+            html_response.status_code = 200
+            html_response.text = html_file.read()
+            return html_response
+
+    @staticmethod
+    def get_file_response(filename):
+        with open(filename, "rb") as file:
+            file_response = Mock(spec=Response)
+            file_response.__enter__ = MagicMock(return_value=file_response)
+            file_response.__exit__ = MagicMock()
+            file_response.status_code = 200
+            file_response.iter_content.return_value = (chunk for chunk in file.read())
+            return file_response
+
+
+class TestAnonFile(unittest.TestCase):
+    """Test cases for the AnonFile class."""
+
     @classmethod
     def setUpClass(cls):
         cls.anon = init_anon()
@@ -52,39 +84,29 @@ class TestAnonFileLibrary(unittest.TestCase):
 
     @patch('anonfile.requests.Session.post')
     def test_upload(self, mocked_session_post):
-        json_content = open("tests/upload.json", "r", encoding='utf-8').read()
+        """ Tests a mocked upload """
 
-        json_response = Mock(spec=Response)
-        json_response.__enter__ = MagicMock(return_value=json_response)
-        json_response.__exit__ = MagicMock()
-        json_response.status_code = 200
-        json_response.json.return_value = json.loads(json_content)
+        # Given
+        json_response = MockData.get_json_response("tests/upload.json")
 
         mocked_session_post.side_effect = [json_response]
 
+        # Assert
         upload = self.anon.upload(self.test_file, progressbar=True, enable_logging=True)
         self.assertTrue(upload.status, msg="Expected 200 HTTP Error Code")
         self.assertTrue(all([upload.url.scheme, upload.url.netloc, upload.url.path]), msg="Invalid URL.")
 
     @patch('anonfile.requests.Session.get')
     def test_preview(self, mocked_session_get):
-        json_content = open("tests/preview.json", "r", encoding='utf-8').read()
-        html_content = open("tests/preview.html", "r", encoding='utf-8').read()
+        """ Tests mocked preview API request """
 
-        json_response = Mock(spec=Response)
-        json_response.__enter__ = MagicMock(return_value=json_response)
-        json_response.__exit__ = MagicMock()
-        json_response.status_code = 200
-        json_response.json.return_value = json.loads(json_content)
-
-        html_response = Mock(spec=Response)
-        html_response.__enter__ = MagicMock(return_value=html_response)
-        html_response.__exit__ = MagicMock()
-        html_response.status_code = 200
-        html_response.text = html_content
+        # Given
+        json_response = MockData.get_json_response("tests/preview.json")
+        html_response = MockData.get_html_response("tests/preview.html")
 
         mocked_session_get.side_effect = [json_response, html_response]
 
+        # Assert
         preview = self.anon.preview(self.test_med_file)
         self.assertTrue(preview.status, msg="Error in status property.")
         self.assertEqual(self.test_med_file, preview.url.geturl(), msg="Error in URL property.")
@@ -94,33 +116,14 @@ class TestAnonFileLibrary(unittest.TestCase):
 
     @patch('anonfile.requests.Session.get')
     def test_download(self, mocked_session_get):
-        json_content = open("tests/preview.json", "r", encoding='utf-8').read()
-        html_content = open("tests/preview.html", "r", encoding='utf-8').read()
+        """ Tests mocked file download with a simulated stream """
 
-        json_response = Mock(spec=Response)
-        json_response.__enter__ = MagicMock(return_value=json_response)
-        json_response.__exit__ = MagicMock()
-        json_response.status_code = 200
-        json_response.json.return_value = json.loads(json_content)
+        # Given
+        json_response = MockData.get_json_response("tests/preview.json")
+        html_response = MockData.get_html_response("tests/preview.html")
+        file_response = MockData.get_file_response("tests/original_topsecret.mp4")
 
-        html_response = Mock(spec=Response)
-        html_response.__enter__ = MagicMock(return_value=html_response)
-        html_response.__exit__ = MagicMock()
-        html_response.status_code = 200
-        html_response.text = html_content
-
-        download_bytes = open("tests/original_topsecret.mp4", "rb").read()
-
-        # Create a generator to mimic streamed content
-        response_data = (chunk for chunk in download_bytes)
-
-        # Mock the Response object's `iter_content` method to return the generator
-        download_response = Mock(spec=Response)
-        download_response.__enter__ = MagicMock(return_value=download_response)
-        download_response.__exit__ = MagicMock()
-        download_response.iter_content.return_value = response_data
-
-        mocked_session_get.side_effect = [json_response, html_response, download_response]
+        mocked_session_get.side_effect = [json_response, html_response, file_response]
 
         download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
         self.assertTrue(download.file_path.exists(), msg="Download not successful.")
@@ -129,33 +132,16 @@ class TestAnonFileLibrary(unittest.TestCase):
 
     @patch('anonfile.requests.Session.get')
     def test_multipart_encoded_files(self, mocked_session_get):
-        json_content = open("tests/preview.json", "r", encoding='utf-8').read()
-        html_content = open("tests/preview.html", "r", encoding='utf-8').read()
+        """ Tests download data integrity utilizing mocked file download """
 
-        json_response = Mock(spec=Response)
-        json_response.__enter__ = MagicMock(return_value=json_response)
-        json_response.__exit__ = MagicMock()
-        json_response.status_code = 200
-        json_response.json.return_value = json.loads(json_content)
+        # Given
+        json_response = MockData.get_json_response("tests/preview.json")
+        html_response = MockData.get_html_response("tests/preview.html")
+        file_response = MockData.get_file_response("tests/original_topsecret.mp4")
 
-        html_response = Mock(spec=Response)
-        html_response.__enter__ = MagicMock(return_value=html_response)
-        html_response.__exit__ = MagicMock()
-        html_response.status_code = 200
-        html_response.text = html_content
+        mocked_session_get.side_effect = [json_response, html_response, file_response]
 
-        download_bytes = open("tests/original_topsecret.mp4", "rb").read()
-
-        # Create a generator to mimic streamed content
-        response_data = (chunk for chunk in download_bytes)
-
-        # Mock the Response object's `iter_content` method to return the generator
-        download_response = Mock(spec=Response)
-        download_response.__enter__ = MagicMock(return_value=download_response)
-        download_response.__exit__ = MagicMock()
-        download_response.iter_content.return_value = response_data
-
-        mocked_session_get.side_effect = [json_response, html_response, download_response]
+        # Assert
 
         # use pre-computed checksum for faster unit tests
         download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
@@ -166,35 +152,3 @@ class TestAnonFileLibrary(unittest.TestCase):
     def tearDownClass(cls):
         for file in cls.garbage:
             remove_file(file)
-
-
-# class TestAnonFileCLI(unittest.TestCase):
-#     @classmethod
-#     def setUpClass(cls):
-#         cls.anon = init_anon()
-#         cls.test_urls = [
-#             "https://anonfiles.com/n5j2O8G9u0/test_txt",
-#             "https://anonfiles.com/pdj2O8Gbud/test_txt",
-#             "https://anonfiles.com/n5j2O8G9u0/test_txt"
-#         ]
-#         cls.test_url = random.choice(cls.test_urls)
-#         cls.batch_file = write_file('batch.txt', cls.test_urls)
-#         cls.logfile = get_logfile_path()
-#
-#     def test_cli_download(self):
-#         call = subprocess.call("anonfile --verbose download --url %s --no-check" % self.test_url, shell=True)
-#         self.assertFalse(call, msg=f"Download failed for: {self.test_url!r}")
-#
-#     def test_cli_batch_download(self):
-#         call = subprocess.call("anonfile --verbose --logging download --batch-file %s --no-check" % self.batch_file, shell=True)
-#         self.assertFalse(call, msg=f"Download failed for: {str(self.batch_file)!r}")
-#
-#     def test_cli_log(self):
-#         print()
-#         call = subprocess.call("anonfile log --read", shell=True)
-#         self.assertTrue(self.logfile.exists() and (call == 0), msg=f"Error: no log file produced in {str(self.logfile)!r}")
-#
-#     @classmethod
-#     def tearDownClass(cls):
-#         remove_file(cls.batch_file)
-#         remove_file(cls.logfile)
