@@ -36,7 +36,7 @@ def write_file(file: str, lines: list) -> Path:
 
 
 def remove_file(file: str) -> None:
-    Path(file).unlink(missing_ok=True)
+    Path(file).unlink() if Path(file).exists() else None
 
 
 class MockData:
