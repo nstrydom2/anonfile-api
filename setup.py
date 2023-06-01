@@ -35,7 +35,7 @@ setup(
         'Source Code': "https://github.com/nstrydom2/anonfile-api",
         'Bug Reports': "https://github.com/nstrydom2/anonfile-api/issues",
         'Changelog': "https://github.com/nstrydom2/anonfile-api/blob/master/CHANGELOG.md"
-    },    
+    },
     python_requires=">=%d.%d" % (python_major, python_minor),
     install_requires=packages,
     extra_requires={
@@ -48,9 +48,10 @@ setup(
         'console_scripts': ['%s=%s.__init__:main' % (package_name, package_name)]
     },
     classifiers=[
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
