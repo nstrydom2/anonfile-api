@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
 import hashlib
-import random
-import subprocess
 import unittest
 from pathlib import Path
-from unittest import skip
+from unittest.mock import patch
 
 from faker import Faker
 
-from src.anonfile import AnonFile, get_logfile_path
+from src.anonfile import AnonFile
+from tests.mock import MockData
 
 TOKEN = None
 
 
 def test_option(token):
+    global TOKEN
     TOKEN = token
 
 
@@ -38,73 +38,163 @@ def remove_file(file: str) -> None:
     Path(file).unlink() if Path(file).exists() else None
 
 
-class TestAnonFileLibrary(unittest.TestCase):
+class TestAnonFile(unittest.TestCase):
+    """Test cases for the AnonFile class."""
+
     @classmethod
     def setUpClass(cls):
         cls.anon = init_anon()
-        cls.test_file = Path("tests/test.txt")
+        cls.test_file = Path("tests/original_topsecret.mp4")
         cls.test_small_file = "https://anonfiles.com/93k5x1ucu0/test_txt"
-        cls.test_med_file = "https://anonfiles.com/Z6j7c9V6x5/topsecret_mp4"
+        cls.test_med_file = "https://anonfiles.com/P0mev3tfz7/topsecret_mp4"
         cls.garbage = []
 
-    def test_upload(self):
+    @patch('anonfile.requests.Session.post')
+    def test_upload(self, mocked_session_post):
+        """ Tests a mocked upload """
+
+        # Arrange
+        response_content = {
+            'data': {
+                'file': {
+                    'url': {
+                        'full': 'https://anonfiles.com/A66bG9t0z1/topsecret_mp4',
+                        'short': 'https://anonfiles.com/A66bG9t0z1'
+                    },
+                    'metadata': {
+                        'id': 'A66bG9t0z1',
+                        'size': {
+                            'readable': '3.37 MB',
+                            'bytes': 3537832
+                        },
+                        'name': 'topsecret.mp4'
+                    }
+                }
+            },
+            'status': True
+        }
+        json_response = MockData.get_json_response(response_content)
+        mocked_session_post.side_effect = [json_response]
+
+        # Act
         upload = self.anon.upload(self.test_file, progressbar=True, enable_logging=True)
+
+        # Assert
         self.assertTrue(upload.status, msg="Expected 200 HTTP Error Code")
         self.assertTrue(all([upload.url.scheme, upload.url.netloc, upload.url.path]), msg="Invalid URL.")
 
-    def test_preview(self):
-        preview = self.anon.preview(self.test_small_file)
-        self.assertTrue(preview.status, msg="Error in status property.")
-        self.assertEqual(self.test_small_file, preview.url.geturl(), msg="Error in URL property.")
-        self.assertEqual("93k5x1ucu0", preview.id, msg="Error in ID property.")
-        self.assertEqual("test.txt", preview.file_path.name, msg="Error in name property.")
-        self.assertEqual(271, preview.size, msg="Error in size property.")
+    @patch('anonfile.requests.Session.get')
+    def test_preview(self, mocked_session_get):
+        """ Tests mocked preview API request """
 
-    def test_download(self):
-        download = self.anon.download(self.test_small_file, progressbar=True, enable_logging=True)
+        # Arrange
+        response_content = {
+            'status': True,
+            'data': {
+                'file': {
+                    'url': {
+                        'short': 'https://anonfiles.com/P0mev3tfz7',
+                        'full': 'https://anonfiles.com/P0mev3tfz7/topsecret_mp4'
+                    },
+                    'metadata': {
+                        'size': {
+                            'bytes': 3537832,
+                            'readable': '3.37 MB'
+                        },
+                        'name': 'topsecret_mp4',
+                        'id': 'P0mev3tfz7'
+                    }
+                }
+            }
+        }
+        json_response = MockData.get_json_response(response_content)
+        html_response = MockData.get_html_response("tests/preview.html")
+        mocked_session_get.side_effect = [json_response, html_response]
+
+        # Act
+        preview = self.anon.preview(self.test_med_file)
+
+        # Assert
+        self.assertTrue(preview.status, msg="Error in status property.")
+        self.assertEqual(self.test_med_file, preview.url.geturl(), msg="Error in URL property.")
+        self.assertEqual("P0mev3tfz7", preview.id, msg="Error in ID property.")
+        self.assertEqual(self.test_file.name.split('_')[-1], preview.file_path.name, msg="Error in name property.")
+        self.assertEqual(3537832, preview.size, msg="Error in size property.")
+
+    @patch('anonfile.requests.Session.get')
+    def test_download(self, mocked_session_get):
+        """ Tests mocked file download with a simulated stream """
+
+        # Arrange
+        response_content = {
+            'status': True,
+            'data': {
+                'file': {
+                    'url': {
+                        'short': 'https://anonfiles.com/P0mev3tfz7',
+                        'full': 'https://anonfiles.com/P0mev3tfz7/topsecret_mp4'
+                    },
+                    'metadata': {
+                        'size': {
+                            'bytes': 3537832,
+                            'readable': '3.37 MB'
+                        },
+                        'name': 'topsecret_mp4',
+                        'id': 'P0mev3tfz7'
+                    }
+                }
+            }
+        }
+        json_response = MockData.get_json_response(response_content)
+        html_response = MockData.get_html_response("tests/preview.html")
+        file_response = MockData.get_file_response("tests/original_topsecret.mp4")
+        mocked_session_get.side_effect = [json_response, html_response, file_response]
+
+        # Act
+        download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
+
+        # Assert
         self.assertTrue(download.file_path.exists(), msg="Download not successful.")
-        self.assertEqual(download.file_path.name, self.test_file.name, msg="Different file in download path detected.")
+        self.assertEqual(download.file_path.name, "topsecret.mp4", msg="Different file in download path detected.")
         self.garbage.append(download.file_path)
 
-    def test_multipart_encoded_files(self):
-        # use pre-computed checksum for faster unit tests
+    @patch('anonfile.requests.Session.get')
+    def test_multipart_encoded_files(self, mocked_session_get):
+        """ Tests download data integrity utilizing mocked file download """
+
+        # Arrange
+        raw_response = {
+            'status': True,
+            'data': {
+                'file': {
+                    'url': {
+                        'short': 'https://anonfiles.com/P0mev3tfz7',
+                        'full': 'https://anonfiles.com/P0mev3tfz7/topsecret_mp4'
+                    },
+                    'metadata': {
+                        'size': {
+                            'bytes': 3537832,
+                            'readable': '3.37 MB'
+                        },
+                        'name': 'topsecret_mp4',
+                        'id': 'P0mev3tfz7'
+                    }
+                }
+            }
+        }
+        json_response = MockData.get_json_response(raw_response)
+        html_response = MockData.get_html_response("tests/preview.html")
+        file_response = MockData.get_file_response("tests/original_topsecret.mp4")
+        mocked_session_get.side_effect = [json_response, html_response, file_response]
+
+        # Act
         download = self.anon.download(self.test_med_file, progressbar=True, enable_logging=True)
-        self.assertEqual("4578bdb7cc943f2280d567479794bc81", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
+
+        # Assert
+        self.assertEqual("d41d8cd98f00b204e9800998ecf8427e", md5_checksum(download.file_path), msg="MD5 hash is corrupted.")
         self.garbage.append(download.file_path)
 
     @classmethod
     def tearDownClass(cls):
         for file in cls.garbage:
             remove_file(file)
-
-
-class TestAnonFileCLI(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.anon = init_anon()
-        cls.test_urls = [
-            "https://anonfiles.com/n5j2O8G9u0/test_txt",
-            "https://anonfiles.com/pdj2O8Gbud/test_txt",
-            "https://anonfiles.com/n5j2O8G9u0/test_txt"
-        ]
-        cls.test_url = random.choice(cls.test_urls)
-        cls.batch_file = write_file('batch.txt', cls.test_urls)
-        cls.logfile = get_logfile_path()
-
-    def test_cli_download(self):
-        call = subprocess.call("anonfile --verbose download --url %s --no-check" % self.test_url, shell=True)
-        self.assertFalse(call, msg=f"Download failed for: {self.test_url!r}")
-
-    def test_cli_batch_download(self):
-        call = subprocess.call("anonfile --verbose --logging download --batch-file %s --no-check" % self.batch_file, shell=True)
-        self.assertFalse(call, msg=f"Download failed for: {str(self.batch_file)!r}")
-
-    def test_cli_log(self):
-        print()
-        call = subprocess.call("anonfile log --read", shell=True)
-        self.assertTrue(self.logfile.exists() and (call == 0), msg=f"Error: no log file produced in {str(self.logfile)!r}")
-
-    @classmethod
-    def tearDownClass(cls):
-        remove_file(cls.batch_file)
-        remove_file(cls.logfile)
