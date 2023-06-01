@@ -77,7 +77,7 @@ def main():
         if args.command == 'preview':
             for url in args.url:
                 preview = anon.preview(url)
-                values = ['online' if preview.status else 'offline', preview.file_path.name, preview.url.geturl(), preview.ddl.geturl(), preview.id, f"{preview.size}B"]
+                values = ['online' if preview.status else 'offline', preview.file_path.name, preview.url.geturl(), preview.ddl.geturl(), preview.id, f"{preview.size_readable}"]
 
                 if args.verbose:
                     __print_dict(dict(zip(['Status', 'File Path', 'URL', 'DDL', 'ID', 'Size'], values)))

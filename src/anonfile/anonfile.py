@@ -150,6 +150,13 @@ class ParseResponse:
         """
         return int(self.json['data']['file']['metadata']['size']['bytes'])
 
+    @property
+    def size_readable(self) -> str:
+        """
+        Return a human-readable file size in base 10.
+        """
+        return self.json['data']['file']['metadata']['size']['readable']
+
     def __str__(self) -> str:
         return str(self.name)
 
