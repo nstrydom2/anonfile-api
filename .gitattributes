@@ -13,7 +13,7 @@
 *.PDF           diff=astextplain
 *.rtf           diff=astextplain
 *.RTF	        diff=astextplain
-*.md       text
+*.md       text eol=crlf
 *.tex      text diff=tex
 *.adoc     text
 *.textile  text
@@ -45,7 +45,7 @@
 *.php             text diff=php
 *.pl              text
 *.ps1             text eol=crlf
-*.py              text diff=python
+*.py              text diff=python eol=crlf
 *.rb              text diff=ruby
 *.sass            text
 *.scm             text
@@ -148,8 +148,8 @@ makefile          text
 *.patch    -text
 
 # Exclude files from exporting
-.gitattributes export-ignore
-.gitignore     export-ignore
+.gitattributes export-ignore eol=crlf
+.gitignore     export-ignore eol=crlf
 
 # Executables
 *.exe             binary
