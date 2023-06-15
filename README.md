@@ -43,7 +43,12 @@ pip install -e .
 ```
 
 instead. It is recommended to create an virtual environment prior
-to installing this library.
+to installing this library. If you only intend to use this library from the CLI,
+use [pipx](https://pypa.github.io/pipx/) for the installation instead:
+
+```bash
+pipx install anonfile
+```
 
 ### Dev Notes
 
@@ -109,6 +114,7 @@ to see all available versions.
 |------------------|-----------------------------|-----------------------------------------------|
 | Nicholas Strydom | nstrydom@gmail.com          | [nstrydom2](https://github.com/nstrydom2)     |
 | hentai-chan      | dev.hentai-chan@outlook.com | [hentai-chan](https://github.com/hentai-chan) |
+| Stefan Greve     | greve.stefan@outlook.jp     | [StefanGreve](https://github.com/stefangreve) |
 
 See also the list of [contributors](https://github.com/nstrydom2/anonfile-api/contributors)
 who participated in this project.
