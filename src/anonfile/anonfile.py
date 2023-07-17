@@ -181,10 +181,6 @@ class AnonFile:
     # topsecret.mkv
     print(preview)
     ```
-
-    Docs
-    ----
-    See full documentation at <https://www.hentai-chan.dev/projects/anonfile>.
     """
     _timeout = (5, 5)
     _total = 5
