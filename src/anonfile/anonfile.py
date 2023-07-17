@@ -360,13 +360,14 @@ class AnonFile:
         for reading the response stream. In contrast, the URL defined in `anon.url.geturl()`
         is a better choice for sharing links.
         """
+        MB = 1_048_576
         download = self.preview(url, path)
 
         options = AnonFile.__progressbar_options(None, f"Download {download.id}", unit='B', total=download.size, disable=progressbar)
         with open(download.file_path, mode='wb') as file_handler:
             with tqdm(**options) as tqdm_handler:
                 with self.__get(download.ddl.geturl(), stream=True) as response:
-                    for chunk in response.iter_content(1024*1024):
+                    for chunk in response.iter_content(chunk_size=1*MB):
                         tqdm_handler.update(len(chunk))
                         file_handler.write(chunk)
 
