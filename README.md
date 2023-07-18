@@ -14,7 +14,7 @@
 
 
 This unofficial Python API was created to make uploading and downloading files
-from <anonfiles.com> simple and effective for programming in Python. The goal of
+from https://anonfiles.com simple and effective for programming in Python. The goal of
 the project is to create an intuitive library for anonymous file sharing.
 
 ## Getting Started
@@ -25,7 +25,7 @@ deploy the project on a live system.
 
 ### Prerequisites
 
-Python 3.7+ is required to run this application, other than that there are no
+Python 3.8+ is required to run this application, other than that there are no
 prerequisites for the project, as the dependencies are included in the repository.
 
 ### Installing
