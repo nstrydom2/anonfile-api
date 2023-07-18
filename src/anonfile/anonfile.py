@@ -46,15 +46,15 @@ from requests_toolbelt import MultipartEncoderMonitor, user_agent
 from tqdm import tqdm
 from urllib3 import Retry
 
-__version__ = "0.2.7"
+__version__ = "1.0.0"
 package_name = "anonfile"
 python_major = "3"
-python_minor = "7"
+python_minor = "8"
 
 try:
     assert sys.version_info >= (int(python_major), int(python_minor))
 except AssertionError:
-    raise RuntimeError(f"\033[31m{package_name!r} requires Python {python_major}.{python_minor}+ (You have Python {sys.version})\033[0m")
+    raise RuntimeError(f"{package_name!r} requires Python {python_major}.{python_minor}+ (You have Python {sys.version})")
 
 #region logging
 
