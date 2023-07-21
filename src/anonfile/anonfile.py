@@ -46,15 +46,15 @@ from requests_toolbelt import MultipartEncoderMonitor, user_agent
 from tqdm import tqdm
 from urllib3 import Retry
 
-__version__ = "0.2.7"
+__version__ = "1.0.0"
 package_name = "anonfile"
 python_major = "3"
-python_minor = "7"
+python_minor = "8"
 
 try:
     assert sys.version_info >= (int(python_major), int(python_minor))
 except AssertionError:
-    raise RuntimeError(f"\033[31m{package_name!r} requires Python {python_major}.{python_minor}+ (You have Python {sys.version})\033[0m")
+    raise RuntimeError(f"{package_name!r} requires Python {python_major}.{python_minor}+ (You have Python {sys.version})")
 
 #region logging
 
@@ -182,10 +182,6 @@ class AnonFile:
     # topsecret.mkv
     print(preview)
     ```
-
-    Docs
-    ----
-    See full documentation at <https://www.hentai-chan.dev/projects/anonfile>.
     """
     _timeout = (5, 5)
     _total = 5
@@ -365,13 +361,14 @@ class AnonFile:
         for reading the response stream. In contrast, the URL defined in `anon.url.geturl()`
         is a better choice for sharing links.
         """
+        MB = 1_048_576
         download = self.preview(url, path)
 
         options = AnonFile.__progressbar_options(None, f"Download {download.id}", unit='B', total=download.size, disable=progressbar)
         with open(download.file_path, mode='wb') as file_handler:
             with tqdm(**options) as tqdm_handler:
                 with self.__get(download.ddl.geturl(), stream=True) as response:
-                    for chunk in response.iter_content(1024*1024):
+                    for chunk in response.iter_content(chunk_size=1*MB):
                         tqdm_handler.update(len(chunk))
                         file_handler.write(chunk)
 

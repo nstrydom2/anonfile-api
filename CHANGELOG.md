@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.0.0 (2023-7-18)
+
+- drops support for Python 3.7 and makes 3.8 the new baseline for further development
+- updates all dependencies
+- adds `size_readable` property to `ParseResponse`
+- improves the testing methodology of the library
+
 ## Version 0.2.7 (2021-9-12)
 
 Makes further improvements to the CLI:

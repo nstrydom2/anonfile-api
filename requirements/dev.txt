@@ -2,3 +2,4 @@
 check-manifest==0.49
 pytest==7.3.1
 faker==18.9.0
+build==0.10.0
