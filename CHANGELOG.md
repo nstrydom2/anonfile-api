@@ -7,6 +7,7 @@
 - adds `size_readable` property to `ParseResponse` (PR #80)
 - improves the testing methodology of the library (PR #77)
 - fixes a bug in which the config directory was set incorrectly on FreeBSD (PR #85)
+- refactors and future proofs CLI code (PR #89)
 
 ## Version 0.2.7 (2021-9-12)
 
