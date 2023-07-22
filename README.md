@@ -72,15 +72,15 @@ from anonfile import AnonFile
 
 anon = AnonFile()
 
-# upload a file and enable progressbar terminal feedback
+# upload a file and enable progressbar terminal feedback (off by default)
 upload = anon.upload('/home/guest/jims_paperwork.doc', progressbar=True)
 print(upload.url.geturl())
 
 # download a file and set the download directory
 from pathlib import Path
 target_dir = Path.home().joinpath('Downloads')
-filename = anon.download("https://anonfiles.com/9ee1jcu6u9/test_txt", path=target_dir)
-print(filename)
+download = anon.download("https://anonfiles.com/9ee1jcu6u9/test_txt", path=target_dir)
+print(download.file_path)
 ```
 
 And voilà, pain-free anonymous file sharing. If you want more information about
