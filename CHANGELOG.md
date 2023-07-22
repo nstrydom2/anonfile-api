@@ -2,10 +2,12 @@
 
 ## Version 1.0.0 (2023-7-18)
 
-- drops support for Python 3.7 and makes 3.8 the new baseline for further development
-- updates all dependencies
-- adds `size_readable` property to `ParseResponse`
-- improves the testing methodology of the library
+- drops support for Python 3.7 and makes 3.8 the new baseline for further development (PR #81)
+- updates all dependencies (PR #81, #84)
+- adds `size_readable` property to `ParseResponse` (PR #80)
+- improves the testing methodology of the library (PR #77)
+- fixes a bug in which the config directory was set incorrectly on FreeBSD (PR #85)
+- refactors and future proofs CLI code (PR #89)
 
 ## Version 0.2.7 (2021-9-12)
 
