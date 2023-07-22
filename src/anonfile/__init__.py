@@ -6,13 +6,14 @@ import json
 import sys
 from argparse import ArgumentParser
 from collections import namedtuple
-from distutils.util import strtobool
 from pathlib import Path
 from typing import List
 
 from .anonfile import *
 from .anonfile import __version__
 
+def str2bool(val: str) -> bool:
+    return val in ('yes', 'y', 'true', 't', '1', 'on', '')
 
 def __from_file(path: Path) -> List[str]:
     with open(path, mode='r', encoding='utf-8') as file_handler:
@@ -94,8 +95,8 @@ def main():
 
                 if args.check and anon.preview(url, args.path).file_path.exists():
                     print(f"Warning: A file with the same name already exists in {str(args.path)!r}.")
-                    choice = input("Proceed with download? [Y/n] ")
-                    if choice == '' or strtobool(choice):
+                    prompt = input("Proceed with download? [Y/n] ")
+                    if str2bool(prompt):
                         print(f"File: {download(url).file_path}")
                 else:
                     print(f"File: {download(url).file_path}")
