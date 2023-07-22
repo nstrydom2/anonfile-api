@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import List
 
 from .anonfile import *
-from .anonfile import __version__
+from .anonfile import __version__, package_name
+
 
 def str2bool(val: str) -> bool:
     return val in ('yes', 'y', 'true', 't', '1', 'on', '')
@@ -87,7 +88,7 @@ def main():
                     'Size': preview.size_readable,
                 }
 
-                print(json.dumps(response, indent=4) if args.verbose else ','.join(response))
+                print(json.dumps(response, indent=4) if args.verbose else ','.join(response.values))
 
         if args.command == 'download':
             for url in (args.url or __from_file(args.batch_file)):
