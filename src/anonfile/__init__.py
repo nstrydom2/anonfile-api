@@ -14,7 +14,7 @@ from .anonfile import __version__, package_name
 
 
 def str2bool(val: str) -> bool:
-    return val in ('yes', 'y', 'true', 't', '1', 'on', '')
+    return val.lower() in ('yes', 'y', 'true', 't', '1', 'on', '')
 
 def __from_file(path: Path) -> List[str]:
     with open(path, mode='r', encoding='utf-8') as file_handler:
