@@ -1,0 +1,2 @@
+# https://packaging.python.org/en/latest/guides/using-manifest-in/
+recursive-include requirements *.txt
