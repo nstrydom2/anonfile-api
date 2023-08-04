@@ -134,7 +134,7 @@ def main():
         sys.exit(2)
     except Exception as error:
         print(error, file=sys.stderr)
-
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
