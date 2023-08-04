@@ -330,7 +330,7 @@ class AnonFile:
         ```
         """
         with self.__get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info")) as response:
-            links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
+            links = re.findall(r'''.*?(?:href|value)=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
             ddl = urlparse(next(filter(lambda link: 'cdn-' in link, links)))
             file_path = Path(path).joinpath(Path(ddl.path).name)
             return ParseResponse(response, file_path, ddl)
