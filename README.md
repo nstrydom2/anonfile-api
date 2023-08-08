@@ -36,10 +36,10 @@ To install the library is as simple as running
 pip install anonfile
 ```
 
-from the command line. To install this library in debug mode, use
+from the command line. To install this library in debug mode with dev dependencies, use
 
 ```bash
-pip install -e .
+pip install -e .[dev]
 ```
 
 instead. It is recommended to create an virtual environment prior

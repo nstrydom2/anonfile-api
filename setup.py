@@ -44,6 +44,7 @@ setup(
     },
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
+    include_package_data=True,
     entry_points={
         'console_scripts': ['%s=%s.__init__:main' % (package_name, package_name)]
     },
