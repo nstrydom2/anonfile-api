@@ -34,5 +34,6 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python -m build  # builds both sdist and wheel
+        # builds both sdist and wheel
+        python -m build --no-isolation
         twine upload dist/**
