@@ -113,8 +113,6 @@ to see all available versions.
 | Name             | Mail Address                | GitHub Profile                                |
 |------------------|-----------------------------|-----------------------------------------------|
 | Nicholas Strydom | nstrydom@gmail.com          | [nstrydom2](https://github.com/nstrydom2)     |
-| hentai-chan      | dev.hentai-chan@outlook.com | [hentai-chan](https://github.com/hentai-chan) |
-| Stefan Greve     | greve.stefan@outlook.jp     | [StefanGreve](https://github.com/stefangreve) |
 
 See also the list of [contributors](https://github.com/nstrydom2/anonfile-api/contributors)
 who participated in this project.
