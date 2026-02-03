@@ -46,7 +46,10 @@ from requests_toolbelt import MultipartEncoderMonitor, user_agent
 from tqdm import tqdm
 from urllib3 import Retry
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
+
+from urllib3.util import Url
+
 package_name = "anonfile"
 python_major = "3"
 python_minor = "8"
@@ -190,11 +193,10 @@ class AnonFile:
     _user_agent = None
     _proxies = None
 
-    API = "https://api.anonfiles.com/"
-
     __slots__ = ['endpoint', 'token', 'timeout', 'total', 'status_forcelist', 'backoff_factor', 'user_agent', 'proxies']
 
     def __init__(self,
+                 url: Union[Url, str] = "https://anonfiles.se/api",
                  token: str="undefined",
                  timeout: Tuple[float,float]=_timeout,
                  total: int=_total,
@@ -202,6 +204,7 @@ class AnonFile:
                  backoff_factor: int=_backoff_factor,
                  user_agent: str=_user_agent,
                  proxies: dict=_proxies) -> AnonFile:
+        self.endpoint = url
         self.token = token
         self.timeout = timeout
         self.total = total,
@@ -300,7 +303,7 @@ class AnonFile:
             with tqdm(**options) as tqdm_handler:
                 encoder_monitor = MultipartEncoderMonitor.from_fields(fields, callback=lambda monitor: AnonFile.__callback(monitor, tqdm_handler))
                 response = self.session.post(
-                    urljoin(AnonFile.API, 'upload'),
+                    urljoin(self.endpoint, 'upload'),
                     data=encoder_monitor,
                     params={'token': self.token},
                     headers={'Content-Type': encoder_monitor.content_type},
@@ -329,8 +332,8 @@ class AnonFile:
         print(f"File Size: {preview.size}B")
         ```
         """
-        with self.__get(urljoin(AnonFile.API, f"v2/file/{urlparse(url).path.split('/')[1]}/info")) as response:
-            links = re.findall(r'''.*?href=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
+        with self.__get(urljoin(self.endpoint, f"v2/file/{urlparse(url).path.split('/')[1]}/info")) as response:
+            links = re.findall(r'''.*?(?:href|value)=['"](.*?)['"].*?''', html.unescape(self.__get(url).text), re.I)
             ddl = urlparse(next(filter(lambda link: 'cdn-' in link, links)))
             file_path = Path(path).joinpath(Path(ddl.path).name)
             return ParseResponse(response, file_path, ddl)

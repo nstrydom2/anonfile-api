@@ -33,6 +33,7 @@ def build_parser(package_name: str, version: str) -> ArgumentParser:
     parser.add_argument('--no-verbose', dest='verbose', action='store_false', help="run commands silently")
     parser.add_argument('-l', '--logging', default=True, action='store_true', help="enable URL logging (default)")
     parser.add_argument('--no-logging', dest='logging', action='store_false', help="disable all logging activities")
+    parser.add_argument('-a', '--api', type=str, default=None, help="configure API endpoint (optional)")
     parser.add_argument('-t', '--token', type=str, default='secret', help="configure an API token (optional)")
     parser.add_argument('-a', '--user-agent', type=str, default=None, help="configure custom User-Agent (optional)")
     parser.add_argument('-p', '--proxies', type=str, default=None, help="configure HTTP and/or HTTPS proxies (optional)")
@@ -45,8 +46,9 @@ def build_parser(package_name: str, version: str) -> ArgumentParser:
     preview_parser.add_argument('-u', '--url', nargs='+', type=str, help="one or more URLs to preview", required=True)
 
     download_parser = subparser.add_parser('download', help="download a file from https://anonfiles.com")
-    download_parser.add_argument('-u', '--url', nargs='*', type=str, help="one or more URLs to download")
-    download_parser.add_argument('-f', '--batch-file', type=Path, nargs='?', help="file containing URLs to download, one URL per line")
+    download_urls_group = download_parser.add_mutually_exclusive_group(required=True)
+    download_urls_group.add_argument('-u', '--url', nargs='*', type=str, help="one or more URLs to download")
+    download_urls_group.add_argument('-f', '--batch-file', type=Path, nargs='?', help="file containing URLs to download, one URL per line")
     download_parser.add_argument('-p', '--path', type=Path, default=Path.cwd(), help="download directory (CWD by default)")
     download_parser.add_argument('-c', '--check', default=True, action='store_true', help="check for duplicates (default)")
     download_parser.add_argument('--no-check', dest='check', action='store_false', help="disable checking for duplicates")
@@ -63,7 +65,11 @@ def main():
 
     try:
         args = parser.parse_args()
-        anon = AnonFile(args.token, user_agent=args.user_agent, proxies=format_proxies(args.proxies) if args.proxies else None)
+
+        anon = AnonFile(url=args.api,
+                        token=args.token,
+                        user_agent=args.user_agent,
+                        proxies=format_proxies(args.proxies) if args.proxies else None)
 
         if args.command is None:
             raise UserWarning("missing a command")
@@ -133,7 +139,7 @@ def main():
         sys.exit(2)
     except Exception as error:
         print(error, file=sys.stderr)
-
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
