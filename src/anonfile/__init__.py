@@ -33,6 +33,7 @@ def build_parser(package_name: str, version: str) -> ArgumentParser:
     parser.add_argument('--no-verbose', dest='verbose', action='store_false', help="run commands silently")
     parser.add_argument('-l', '--logging', default=True, action='store_true', help="enable URL logging (default)")
     parser.add_argument('--no-logging', dest='logging', action='store_false', help="disable all logging activities")
+    parser.add_argument('-a', '--api', type=str, default=None, help="configure API endpoint (optional)")
     parser.add_argument('-t', '--token', type=str, default='secret', help="configure an API token (optional)")
     parser.add_argument('-a', '--user-agent', type=str, default=None, help="configure custom User-Agent (optional)")
     parser.add_argument('-p', '--proxies', type=str, default=None, help="configure HTTP and/or HTTPS proxies (optional)")
@@ -64,7 +65,11 @@ def main():
 
     try:
         args = parser.parse_args()
-        anon = AnonFile(args.token, user_agent=args.user_agent, proxies=format_proxies(args.proxies) if args.proxies else None)
+
+        anon = AnonFile(url=args.api,
+                        token=args.token,
+                        user_agent=args.user_agent,
+                        proxies=format_proxies(args.proxies) if args.proxies else None)
 
         if args.command is None:
             raise UserWarning("missing a command")
